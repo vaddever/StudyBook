@@ -158,6 +158,20 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
 .menu{display:grid;gap:8px}
 .menu .btn{text-align:start}
 .note{font-size:.88rem;color:var(--muted);margin:10px 0 0}
+.filebtn{display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--line);border-radius:14px;padding:18px;background:var(--paper);font-weight:600;cursor:pointer;margin-bottom:12px}
+.filebtn:focus-within{outline:3px solid var(--brand)}
+.pstatus{font-size:.92rem;color:var(--muted);margin:0 0 10px;min-height:1.5em}
+.pstatus.err{color:var(--bad)}
+.ai-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ai-row .btn{font-size:.92rem}
+.preview{max-height:42vh;overflow:auto;border:1px solid var(--line);border-radius:14px;margin-bottom:14px}
+.prow{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:flex-start}
+.prow:last-child{border-bottom:0}
+.prow.off{opacity:.45}
+.prow input[type=checkbox]{margin-top:10px;width:18px;height:18px;flex:none}
+.prow .fields{flex:1;display:grid;gap:6px;min-width:0}
+.prow textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);color:var(--ink);font-size:.95rem;line-height:1.7}
+.prow textarea.pa{background:var(--hi);color:var(--hi-ink);border-color:transparent}
 
 .fab{position:fixed;inset-inline-end:max(16px,calc(50% - 364px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;border:0;background:var(--brand);color:var(--brand-ink);border-radius:16px;padding:12px 18px;font-weight:800;box-shadow:0 6px 18px rgba(20,30,70,.25)}
 .toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 18px;border-radius:12px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90%}
@@ -230,6 +244,7 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
     <div class="seg" id="addSeg">
       <button type="button" data-mode="one" aria-pressed="true" data-t="oneQ"></button>
       <button type="button" data-mode="bulk" aria-pressed="false" data-t="manyQ"></button>
+      <button type="button" data-mode="pdf" aria-pressed="false">PDF</button>
     </div>
     <label class="f"><span data-t="subject"></span><input id="fSubj" list="subjList" data-tp="subjectPh" dir="auto"></label>
     <datalist id="subjList"></datalist>
@@ -240,6 +255,16 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
     <div id="bulkBox" hidden>
       <p class="hint" data-t="bulkHint"></p>
       <label class="f"><span class="sr" data-t="manyQ"></span><textarea id="fBulk" rows="9" dir="auto"></textarea></label>
+    </div>
+    <div id="pdfBox" hidden>
+      <p class="hint" data-t="pdfHint"></p>
+      <label class="filebtn">📄 <span data-t="choosePdf"></span><input type="file" id="pdfFile" accept="application/pdf,.pdf" class="sr"></label>
+      <p class="pstatus" id="pdfStatus" aria-live="polite"></p>
+      <div class="ai-row" id="aiRow" hidden>
+        <button type="button" class="btn" id="aiText" data-t="aiFind"></button>
+        <button type="button" class="btn ghost" id="aiImg" data-t="aiScan" hidden></button>
+      </div>
+      <div class="preview" id="pdfPreview" hidden></div>
     </div>
     <div class="row">
       <button type="button" class="btn primary" id="saveBtn" data-t="save"></button>
@@ -278,6 +303,9 @@ const I18N={
   oneQ:"އެއް ސުވާލު",manyQ:"ގިނަ ސުވާލު",subject:"މާއްދާ / ބައި",subjectPh:"މިސާލު: ސައިންސް",question:"ސުވާލު",answer:"ޖަވާބު",
   bulkHint:"ކޮންމެ ސުވާލެއް ފަށާނީ \"ސ:\" އިން، ޖަވާބު \"ޖ:\" އިން. ސުވާލުތަކުގެ މެދުގައި ހުސް ލައިނެއް ދޫކޮށްލާ. (Q: / A: ވެސް ބޭނުންކުރެވޭނެ)",
   bulkPh:"ސ: ދިވެހިރާއްޖޭގެ ވެރިރަށަކީ ކޮބާ؟\nޖ: މާލެ\n\nސ: 7 × 8 ކިތަކަށް؟\nޖ: 56",
+  pdfHint:"ސުވާލާއި ޖަވާބު ހުރި PDF ފައިލެއް ހޮވާ. ފެނުނު ސުވާލުތައް ރައްކާކުރުމުގެ ކުރިން ބަލައި ބަދަލުކުރެވޭނެ.",choosePdf:"PDF ފައިލް ހޮވާ",pdfLoading:"PDF ކިޔަނީ…",
+  pdfFound:"{p} ސަފުހާއިން {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",pdfNone:"{p} ސަފުހާ ކިޔައިފި، ނަމަވެސް ސ:/ޖ: ނުވަތަ Q:/A: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު. Claude ލައްވާ ހޯދައިލާ.",pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔައިލާ.",pdfFail:"PDF ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",
+  aiFind:"✨ Claude ލައްވާ ސުވާލު ހޯދާ",aiScan:"✨ ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔާ",aiWorking:"Claude ސުވާލު ހޯދަނީ… ({i}/{n})",aiDone:"Claude އަށް {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",aiFail:"Claude އަށް ނުކިޔުނު. އަނެއްކާ މަސައްކަތްކޮށްލާ.",aiDenied:"Claude ބޭނުންކުރުމުގެ ހުއްދަ ނުލިބުނު.",aiNothing:"Claude އަށްވެސް ސުވާލެއް ނުފެނުނު.",addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ PDF ފައިލެއް ހޮވާ",
   save:"ރައްކާކުރޭ",cancel:"ކެންސަލް",close:"ބަންދުކުރޭ",moreOptions:"އިތުރު އޮޕްޝަންތައް",switchLang:"English ބަހަށް ބަދަލުކުރޭ",
   export:"ބެކަޕް ފައިލް ޑައުންލޯޑްކުރޭ",import:"ބެކަޕް ފައިލުން ސުވާލު ނަގާ",resetProg:"ދަސްކުރި މިންވަރު ފުރަތަމައިން ފަށާ",theme:"ކުލަ (ދުވާލު / ރޭގަނޑު)",
   noteLocal:"ސުވާލުތައް ރައްކާވަނީ މި ޑިވައިސްގައި. ބެކަޕް ފައިލުން އެހެން ޑިވައިސްއަކަށް ގެންދެވޭނެ.",noteCloud:"ސުވާލުތައް ރައްކާވަނީ ކްލައުޑްގައި. ސައިން އިން ކޮށްގެން ކޮންމެ ޑިވައިސްއަކުން ބެލޭނެ.",
@@ -306,6 +334,9 @@ const I18N={
   oneQ:"One question",manyQ:"Many questions",subject:"Subject / topic",subjectPh:"e.g. Science",question:"Question",answer:"Answer",
   bulkHint:"Start each question with \"Q:\" and each answer with \"A:\". Leave a blank line between questions. (ސ: / ޖ: also work)",
   bulkPh:"Q: What is the capital of the Maldives?\nA: Malé\n\nQ: What is 7 × 8?\nA: 56",
+  pdfHint:"Choose a PDF with questions and answers. You can check and edit what's found before saving.",choosePdf:"Choose PDF file",pdfLoading:"Reading PDF…",
+  pdfFound:"Found {n} questions in {p} pages. Check them, then save.",pdfNone:"Read {p} pages but found no questions in Q:/A: format. Try finding them with Claude.",pdfNoText:"This PDF has no text (it looks scanned). Try reading the pages as images.",pdfFail:"Couldn't read this PDF. Check the file.",
+  aiFind:"✨ Find Q&A with Claude",aiScan:"✨ Read pages as images",aiWorking:"Claude is finding questions… ({i}/{n})",aiDone:"Claude found {n} questions. Check them, then save.",aiFail:"Claude couldn't read it. Try again.",aiDenied:"Permission to use Claude wasn't given.",aiNothing:"Claude didn't find any questions either.",addSelected:"Add {n} selected questions",pickPdf:"Choose a PDF file first",
   save:"Save",cancel:"Cancel",close:"Close",moreOptions:"More options",switchLang:"ދިވެހި ބަހަށް ބަދަލުކުރޭ",
   export:"Download backup file",import:"Restore from backup file",resetProg:"Reset learning progress",theme:"Colors (light / dark)",
   noteLocal:"Questions are saved on this device. Use a backup file to move them to another device.",noteCloud:"Questions are saved to the cloud. Sign in on any device to see them.",
@@ -483,14 +514,14 @@ $("#search").addEventListener("input",renderList);
 
 /* ---------- add / edit ---------- */
 let editing=null,addMode="one";
-function setAddMode(m){addMode=m;$$("#addSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===m));$("#oneBox").hidden=m!=="one";$("#bulkBox").hidden=m!=="bulk"}
+function setAddMode(m){addMode=m;$$("#addSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===m));$("#oneBox").hidden=m!=="one";$("#bulkBox").hidden=m!=="bulk";$("#pdfBox").hidden=m!=="pdf";updateSaveLabel()}
 $$("#addSeg button").forEach(b=>b.onclick=()=>setAddMode(b.dataset.mode));
 function openAdd(card){
   editing=card||null;
   $("#addTitle").textContent=card?t("editQuestion"):t("addQuestion");
   $("#addSeg").hidden=!!card;setAddMode("one");
   $("#fSubj").value=card?card.subj:(listFilter!==ALL?listFilter:($("#fSubj").value||""));
-  $("#fQ").value=card?card.q:"";$("#fA").value=card?card.a:"";$("#fBulk").value="";
+  $("#fQ").value=card?card.q:"";$("#fA").value=card?card.a:"";$("#fBulk").value="";resetPdf();
   $("#addDlg").showModal();setTimeout(()=>$("#fQ").focus(),50);
 }
 document.addEventListener("click",e=>{if(e.target.closest("[data-open-add]"))openAdd()});
@@ -512,6 +543,11 @@ function parseBulk(text,subj){
 }
 $("#saveBtn").onclick=async()=>{
   const subj=$("#fSubj").value.trim();
+  if(addMode==="pdf"){
+    const list=pdfRows.filter(r=>r.on&&r.q.trim()&&r.a.trim()).map((r,i)=>({id:uid(),q:r.q.trim(),a:r.a.trim(),subj,known:0,seen:0,created:Date.now()+i}));
+    if(!list.length){toast(pdfRows.length?t("needBoth"):t("pickPdf"));return}
+    $("#addDlg").close();await persistMany(list);toast(t("nAdded",{n:list.length}));resetPdf();return;
+  }
   if(addMode==="bulk"){
     const list=parseBulk($("#fBulk").value,subj);
     if(!list.length){toast(t("bulkNone"));return}
@@ -524,6 +560,124 @@ $("#saveBtn").onclick=async()=>{
   $("#fQ").value="";$("#fA").value="";$("#fQ").focus();toast(t("addedNext"));
 };
 $("#sampleBtn").onclick=()=>persistMany(t("sampleSet").map((r,i)=>({id:uid(),subj:r[0],q:r[1],a:r[2],known:0,seen:0,created:Date.now()+i})));
+
+/* ---------- PDF import ---------- */
+const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfRows=[],pdfText="",pdfDoc=null,sampleCap=null,sampleTried=false;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+async function loadPdfJs(){
+  if(!window.pdfjsLib){await loadScript(PDFJS+"pdf.min.js")}
+  if(!window.pdfjsWorker){await loadScript(PDFJS+"pdf.worker.min.js")} // runs on the main thread (no cross-origin worker)
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";
+  return window.pdfjsLib;
+}
+async function getSample(){
+  if(sampleTried)return sampleCap;sampleTried=true;
+  try{sampleCap=window.claude&&window.claude.use?await claude.use("sample"):null}catch(e){sampleCap=null}
+  return sampleCap;
+}
+function pStatus(msg,err){const el=$("#pdfStatus");el.textContent=msg||"";el.classList.toggle("err",!!err)}
+function updateSaveLabel(){
+  const b=$("#saveBtn");
+  if(addMode==="pdf"){const n=pdfRows.filter(r=>r.on).length;b.textContent=t("addSelected",{n});b.disabled=!n}
+  else{b.textContent=t("save");b.disabled=false}
+}
+function resetPdf(){pdfRows=[];pdfText="";pdfDoc=null;$("#pdfFile").value="";pStatus("");$("#aiRow").hidden=true;$("#pdfPreview").hidden=true;$("#pdfPreview").innerHTML="";updateSaveLabel()}
+function renderPreview(){
+  const box=$("#pdfPreview");box.hidden=!pdfRows.length;
+  box.innerHTML=pdfRows.map((r,i)=>`<div class="prow${r.on?"":" off"}" data-i="${i}"><input type="checkbox" ${r.on?"checked":""} aria-label="${i+1}">
+    <div class="fields"><textarea data-k="q" rows="2" dir="auto">${esc(r.q)}</textarea><textarea class="pa" data-k="a" rows="2" dir="auto">${esc(r.a)}</textarea></div></div>`).join("");
+  updateSaveLabel();
+}
+$("#pdfPreview").addEventListener("input",e=>{
+  const row=e.target.closest(".prow");if(!row)return;const r=pdfRows[+row.dataset.i];
+  if(e.target.type==="checkbox"){r.on=e.target.checked;row.classList.toggle("off",!r.on);updateSaveLabel()}
+  else r[e.target.dataset.k]=e.target.value;
+});
+$("#pdfPreview").addEventListener("change",e=>{if(e.target.type==="checkbox"){const row=e.target.closest(".prow");pdfRows[+row.dataset.i].on=e.target.checked;row.classList.toggle("off",!e.target.checked);updateSaveLabel()}});
+
+async function pageLines(page){
+  const tc=await page.getTextContent();const rows=[];
+  tc.items.forEach(it=>{if(!it.str)return;const y=it.transform[5],x=it.transform[4];
+    let row=rows.find(r=>Math.abs(r.y-y)<3);if(!row){row={y,items:[]};rows.push(row)}row.items.push({x,s:it.str})});
+  rows.sort((a,b)=>b.y-a.y);
+  return rows.map(r=>{const rtl=/[\u0780-\u07BF]/.test(r.items.map(i=>i.s).join(""));
+    r.items.sort((a,b)=>rtl?b.x-a.x:a.x-b.x);return r.items.map(i=>i.s).join(" ").replace(/\s+/g," ").trim()}).filter(Boolean);
+}
+function parseLoose(text){
+  const lines=text.split("\n").map(l=>l.trim()).filter(Boolean);
+  const QR=/^(?:(?:Q|ސ)\s*\d*\s*[:：.)]|(?:ސުވާލު|Question|QUESTION|question)\s*\d*\s*[:：.\-)])\s*(.*)$/;
+  const AR=/^(?:(?:A|ޖ)\s*[:：]|(?:ޖަވާބު|Ans|ANS|Answer|ANSWER|answer)\s*[:：.\-)])\s*(.*)$/;
+  const NR=/^\(?\d{1,3}\s*[.)\-]\s+(.*)$/;
+  const hasA=lines.some(l=>AR.test(l));if(!hasA)return [];
+  const out=[];let q="",a="",cur=null;
+  const push=()=>{if(q.trim()&&a.trim())out.push({q:q.trim(),a:a.trim(),on:true});q="";a="";cur=null};
+  lines.forEach(l=>{
+    let m;
+    if((m=l.match(AR))){cur="a";a+=(a?"\n":"")+m[1];return}
+    if((m=l.match(QR))||((cur===null||cur==="a")&&(m=l.match(NR)))){push();cur="q";q=m[1];return}
+    if(cur==="q")q+=" "+l;else if(cur==="a")a+="\n"+l;
+  });
+  push();return out;
+}
+$("#pdfFile").addEventListener("change",async e=>{
+  const f=e.target.files[0];if(!f)return;
+  pdfRows=[];renderPreview();$("#aiRow").hidden=true;pStatus(t("pdfLoading"));
+  try{
+    const lib=await loadPdfJs();
+    pdfDoc=await lib.getDocument({data:await f.arrayBuffer(),isEvalSupported:false}).promise;
+    const pages=[];for(let i=1;i<=pdfDoc.numPages;i++){pages.push((await pageLines(await pdfDoc.getPage(i))).join("\n"))}
+    pdfText=pages.join("\n\n");
+    pdfRows=parseLoose(pdfText);renderPreview();
+    const p=pdfDoc.numPages,noText=pdfText.replace(/\s/g,"").length<20;
+    pStatus(noText?t("pdfNoText"):pdfRows.length?t("pdfFound",{n:pdfRows.length,p}):t("pdfNone",{p}),!pdfRows.length);
+    const s=await getSample();
+    if(s){
+      $("#aiRow").hidden=false;$("#aiText").hidden=noText;
+      let lim=null;try{lim=await s.limits()}catch(err){}
+      $("#aiImg").hidden=!(lim&&lim.images);
+    }
+  }catch(err){console.error(err);pStatus(t("pdfFail"),true)}
+});
+
+const AI_RULES='You turn study material into flashcards. The material may be in Dhivehi (Thaana script), English, or both. '+
+ 'If it already contains questions with answers, return every pair with its original wording and language. '+
+ 'If it is notes without questions, write clear study questions whose answers come only from the material, in the same language as the material. '+
+ 'Never add facts that are not in the material. Return ONLY a JSON array like [{"q":"question","a":"answer"}], or [] if nothing is usable.';
+function normAI(v){const arr=Array.isArray(v)?v:(v&&Array.isArray(v.items)?v.items:(v&&Array.isArray(v.cards)?v.cards:[]));
+  return arr.filter(x=>x&&x.q&&x.a).map(x=>({q:String(x.q).trim(),a:String(x.a).trim(),on:true}))}
+async function runAI(useImages){
+  const s=await getSample();if(!s)return;
+  const btns=[$("#aiText"),$("#aiImg"),$("#saveBtn")];btns.forEach(b=>b.disabled=true);
+  const found=[];
+  try{
+    if(useImages){
+      const n=Math.min(pdfDoc.numPages,15);
+      for(let i=1;i<=n;i++){
+        pStatus(t("aiWorking",{i,n}));
+        const page=await pdfDoc.getPage(i);const vp=page.getViewport({scale:1.6});
+        const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;
+        await page.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
+        const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",.85));
+        found.push(...normAI(await s.json(AI_RULES+"\n\nThe material is the attached page image. Read the text carefully.",{images:[blob],modelTier:"default"})));
+      }
+    }else{
+      const chunks=[];for(let i=0;i<pdfText.length&&chunks.length<10;i+=9000)chunks.push(pdfText.slice(i,i+9000));
+      for(let i=0;i<chunks.length;i++){
+        pStatus(t("aiWorking",{i:i+1,n:chunks.length}));
+        found.push(...normAI(await s.json(AI_RULES+"\n\nMATERIAL (extracted from a PDF, line order may be imperfect):\n"+chunks[i],{modelTier:"default"})));
+      }
+    }
+    const seen=new Set();pdfRows=found.filter(r=>{const k=r.q+"|"+r.a;if(seen.has(k))return false;seen.add(k);return true});
+    renderPreview();pStatus(pdfRows.length?t("aiDone",{n:pdfRows.length}):t("aiNothing"),!pdfRows.length);
+  }catch(err){
+    console.error(err);
+    if(found.length){pdfRows=found;renderPreview()}
+    pStatus(err&&err.code==="not_granted"?t("aiDenied"):t("aiFail"),true);
+  }finally{$("#aiText").disabled=false;$("#aiImg").disabled=false;updateSaveLabel()}
+}
+$("#aiText").onclick=()=>runAI(false);
+$("#aiImg").onclick=()=>runAI(true);
 
 /* ---------- flashcards ---------- */
 let fDeck=[],fIdx=0,fOnlyNew=false;
