@@ -185,6 +185,55 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
 .authcard .full{width:100%}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== polish: header, summary, list cards, nav ===== */
+header{padding:16px 0 12px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:48px;height:48px;border-radius:15px;background:var(--hi);color:var(--hi-ink);display:grid;place-items:center;flex:none}
+.logo svg{width:26px;height:26px}
+.title{font-size:1.4rem;line-height:1.45;color:var(--ink)}
+.title span{background:none;padding:0}
+.sub{font-size:.9rem;line-height:1.5}
+.iconbtn{min-width:42px;height:42px;border-radius:13px}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px 16px;margin:4px 0 16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px;text-align:center}
+.stats>span{display:flex;flex-direction:column;align-items:center;font-size:.85rem;line-height:1.5}
+.stats b{order:-1;margin:0;font-size:1.6rem;line-height:1.3;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
+.stats>span:nth-child(2) b{color:var(--ok)}
+.stats>span:nth-child(3) b{color:var(--brand)}
+.summary .bar{height:8px;margin:0}
+.search{padding-inline-start:42px;background-repeat:no-repeat;background-size:18px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238895AD' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E")}
+html[dir="rtl"] .search{background-position:right 14px center}
+html[dir="ltr"] .search{background-position:left 14px center}
+#toggleAll{background:var(--chip);border-color:transparent;border-radius:12px;display:inline-flex;align-items:center;gap:8px}
+#toggleAll svg{width:18px;height:18px;flex:none}
+#toggleAll[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.list{display:grid;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:border-color .2s}
+.item.open{border-color:var(--brand)}
+.q{padding:14px 14px;align-items:center}
+.q::before{margin-top:0;background:var(--chip);color:var(--brand);font-weight:700;border-radius:9px;min-width:30px;height:30px}
+.q .tog{margin:0;width:30px;height:30px;border-radius:50%;background:var(--chip);display:grid;place-items:center}
+.q .tog svg{width:16px;height:16px}
+.ans{padding:0 14px 14px;padding-inline-start:56px}
+.ans p{margin-bottom:10px}
+li.empty{background:none;border:0}
+.fab{display:flex;align-items:center;gap:8px;border-radius:18px;padding:14px 20px}
+.fab svg{width:22px;height:22px}
+nav.tabs button{padding:8px 2px 6px;gap:2px;font-size:.78rem}
+nav.tabs .ic{display:grid;place-items:center;width:56px;height:32px;border-radius:16px;transition:background .2s}
+nav.tabs .ic svg{width:22px;height:22px}
+nav.tabs button[aria-current="page"] .ic{background:var(--chip);transform:none}
+@media (max-width:560px){
+  .wrap{padding:0 14px 130px}
+  #v-list .row .search{flex-basis:100%}
+  #toggleAll{flex:1;justify-content:center}
+  .fab{width:58px;height:58px;padding:0;justify-content:center;border-radius:20px}
+  .fab .fab-l{display:none}
+  .title{font-size:1.25rem}
+  .logo{width:44px;height:44px;border-radius:14px}
+}
 </style>
 </head>
 <body>
@@ -207,9 +256,12 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
 
 <div class="wrap">
   <header>
-    <div>
-      <h1 class="title"><span data-t="appTitle"></span></h1>
-      <p class="sub" id="modeNote" data-t="tagline"></p>
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/><path d="M8 7h8M8 11h6"/></svg></div>
+      <div style="min-width:0">
+        <h1 class="title"><span data-t="appTitle"></span></h1>
+        <p class="sub" id="modeNote" data-t="tagline"></p>
+      </div>
     </div>
     <div class="hdr-actions">
       <button class="iconbtn langbtn" id="langBtn" aria-label="Switch language / ބަސް ބަދަލުކުރޭ"></button>
@@ -217,12 +269,14 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
     </div>
   </header>
 
+  <div class="summary">
   <div class="stats" aria-live="polite">
     <span><span data-t="stTotal"></span> <b id="stTotal" class="num">0</b></span>
     <span><span data-t="stKnown"></span> <b id="stKnown" class="num">0</b></span>
     <span><span data-t="stLeft"></span> <b id="stLeft" class="num">0</b></span>
   </div>
   <div class="bar" aria-hidden="true"><i id="stBar"></i></div>
+  </div>
 
   <section class="view on" id="v-list">
     <div class="row">
@@ -250,15 +304,15 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
   <section class="view" id="v-group"><div class="stage" id="groupStage"></div></section>
 </div>
 
-<button class="fab" data-open-add data-t="fab"></button>
+<button class="fab" data-open-add data-ta="addQuestion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="fab-l" data-t="fabShort"></span></button>
 
 <nav class="tabs">
   <div class="in">
-    <button data-tab="list" aria-current="page"><span class="ic">📒</span><span data-t="tabList"></span></button>
-    <button data-tab="flash"><span class="ic">🃏</span><span data-t="tabFlash"></span></button>
-    <button data-tab="quiz"><span class="ic">✅</span><span data-t="tabQuiz"></span></button>
-    <button data-tab="match"><span class="ic">🧩</span><span data-t="tabMatch"></span></button>
-    <button data-tab="group"><span class="ic">👥</span><span data-t="tabGroup"></span></button>
+    <button data-tab="list" aria-current="page"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/><path d="M8 7h8M8 11h6"/></svg></span><span data-t="tabList"></span></button>
+    <button data-tab="flash"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2.5"/><path d="M8 3h10.5A2.5 2.5 0 0 1 21 5.5V16"/></svg></span><span data-t="tabFlash"></span></button>
+    <button data-tab="quiz"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9"/></svg></span><span data-t="tabQuiz"></span></button>
+    <button data-tab="match"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/></svg></span><span data-t="tabMatch"></span></button>
+    <button data-tab="group"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M21.5 20a6.5 6.5 0 0 0-3.8-5.9"/></svg></span><span data-t="tabGroup"></span></button>
   </div>
 </nav>
 
@@ -348,7 +402,7 @@ const I18N={
  dv:{appTitle:"ދަސްކުރުމުގެ ފޮތް",tagline:"ސުވާލާއި ޖަވާބު ރިވައިޒްކުރުމަށް",cloudTag:"ކްލައުޑްގައި ރައްކާވެފައި",
   stTotal:"ސުވާލު",stKnown:"ދަސްވެއްޖެ",stLeft:"ބާކީ",searchPh:"ސުވާލެއް ހޯދާ…",showAll:"ހުރިހާ ޖަވާބެއް ދައްކާ",hideAll:"ހުރިހާ ޖަވާބެއް ފޮރުވާ",
   emptyTitle:"އަދި ސުވާލެއް ނެތް",emptyText:"ފުރަތަމަ ސުވާލާއި ޖަވާބު ލިޔެލާ، ނުވަތަ ނަމޫނާއިން ފަށާ.",addQuestion:"ސުވާލު އިތުރުކުރޭ",editQuestion:"ސުވާލު ބަދަލުކުރޭ",samples:"ނަމޫނާ ސުވާލުތައް",
-  fab:"+ ސުވާލު",tabList:"ސުވާލުތައް",tabFlash:"ފްލޭޝްކާޑް",tabQuiz:"ކުއިޒް",tabMatch:"ގުޅުވާ",tabGroup:"ގްރޫޕް",
+  fab:"+ ސުވާލު",fabShort:"ސުވާލު",tabList:"ސުވާލުތައް",tabFlash:"ފްލޭޝްކާޑް",tabQuiz:"ކުއިޒް",tabMatch:"ގުޅުވާ",tabGroup:"ގްރޫޕް",
   oneQ:"އެއް ސުވާލު",manyQ:"ގިނަ ސުވާލު",subject:"މާއްދާ / ބައި",subjectPh:"މިސާލު: ސައިންސް",question:"ސުވާލު",answer:"ޖަވާބު",
   bulkHint:"ކޮންމެ ސުވާލެއް ފަށާނީ \"ސ:\" އިން، ޖަވާބު \"ޖ:\" އިން. ސުވާލުތަކުގެ މެދުގައި ހުސް ލައިނެއް ދޫކޮށްލާ. (Q: / A: ވެސް ބޭނުންކުރެވޭނެ)",
   bulkPh:"ސ: ދިވެހިރާއްޖޭގެ ވެރިރަށަކީ ކޮބާ؟\nޖ: މާލެ\n\nސ: 7 × 8 ކިތަކަށް؟\nޖ: 56",
@@ -384,7 +438,7 @@ const I18N={
  en:{appTitle:"Study Book",tagline:"Revise with questions and answers",cloudTag:"Saved to the cloud",
   stTotal:"Questions",stKnown:"Learned",stLeft:"To go",searchPh:"Search questions…",showAll:"Show all answers",hideAll:"Hide all answers",
   emptyTitle:"No questions yet",emptyText:"Write your first question and answer, or start with the samples.",addQuestion:"Add question",editQuestion:"Edit question",samples:"Sample questions",
-  fab:"+ Question",tabList:"Questions",tabFlash:"Flashcards",tabQuiz:"Quiz",tabMatch:"Match",tabGroup:"Group",
+  fab:"+ Question",fabShort:"Question",tabList:"Questions",tabFlash:"Flashcards",tabQuiz:"Quiz",tabMatch:"Match",tabGroup:"Group",
   oneQ:"One question",manyQ:"Many questions",subject:"Subject / topic",subjectPh:"e.g. Science",question:"Question",answer:"Answer",
   bulkHint:"Start each question with \"Q:\" and each answer with \"A:\". Leave a blank line between questions. (ސ: / ޖ: also work)",
   bulkPh:"Q: What is the capital of the Maldives?\nA: Malé\n\nQ: What is 7 × 8?\nA: 56",
@@ -449,13 +503,14 @@ function applyLang(){
   $("#langBtn").textContent=$("#langBtn3").textContent=lang==="dv"?"EN":"ދިވެހި";
   $("#modeNote").textContent=mode==="db"?t("cloudTag"):t("tagline");
   $("#storeNote").textContent=mode==="db"?t("noteCloud"):t("noteLocal");
-  $("#toggleAll").textContent=showAll?t("hideAll"):t("showAll");
+  setToggleLabel();
   renderAllStatic();go(current,true);setAuthMode(authMode);updateAccountUI();
 }
 function switchLang(){lang=lang==="dv"?"en":"dv";try{localStorage.setItem("dv-study-lang",lang)}catch(e){}applyLang()}
 $("#langBtn").onclick=switchLang;$("#langBtn3").onclick=switchLang;
 $("#langBtn2").onclick=()=>{$("#menuDlg").close();switchLang()};
 
+function setToggleLabel(){const b=$("#toggleAll");b.innerHTML=(showAll?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6A17.4 17.4 0 0 0 2 12s3.5 7 10 7a9.9 9.9 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>')+"<span>"+(showAll?t("hideAll"):t("showAll"))+"</span>";b.setAttribute("aria-pressed",showAll)}
 /* ---------- storage ---------- */
 function loadLocal(){try{const r=localStorage.getItem(LS_KEY);cards=r?JSON.parse(r):[]}catch(e){cards=[]}}
 function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(cards))}catch(e){}}
@@ -548,7 +603,7 @@ function renderList(){
   $("#list").innerHTML=items.map(c=>{
     const open=showAll||openIds.has(c.id);
     return `<li class="item${open?" open":""}" data-id="${c.id}">
-      <button class="q" aria-expanded="${open}"><span class="txt" dir="auto">${esc(c.q)}</span><span class="tog" aria-hidden="true">▾</span></button>
+      <button class="q" aria-expanded="${open}"><span class="txt" dir="auto">${esc(c.q)}</span><span class="tog" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
       <div class="ans"><p>${hl(c.a)}</p>
         <div class="meta">${c.subj?`<span dir="auto">${esc(c.subj)}</span>`:""}${isKnown(c)?`<span>${t("learned")}</span>`:""}
         <button data-edit>${t("edit")}</button><button class="del" data-del>${t("del")}</button></div></div></li>`}).join("")
@@ -566,8 +621,7 @@ $("#list").addEventListener("click",e=>{
 });
 $("#toggleAll").addEventListener("click",()=>{
   showAll=!showAll;if(!showAll)openIds.clear();
-  $("#toggleAll").textContent=showAll?t("hideAll"):t("showAll");
-  $("#toggleAll").setAttribute("aria-pressed",showAll);renderList();
+  setToggleLabel();renderList();
 });
 $("#search").addEventListener("input",renderList);
 
