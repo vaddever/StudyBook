@@ -234,9 +234,40 @@ nav.tabs button[aria-current="page"] .ic{background:var(--chip);transform:none}
   .title{font-size:1.25rem}
   .logo{width:44px;height:44px;border-radius:14px}
 }
+
+/* ===== group competitions ===== */
+.full{width:100%}
+.badge[hidden]{display:none}
+body:not(.on-list) .fab{display:none}
+nav.tabs .ic{position:relative}
+.badge{position:absolute;top:-4px;inset-inline-end:6px;min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font-size:.7rem;font-weight:800;display:grid;place-items:center;padding:0 5px;font-family:system-ui,sans-serif;line-height:1}
+.glists{width:100%;max-width:600px;display:grid;gap:10px}
+.gsec{font-weight:800;margin:8px 0 0;font-size:1rem}
+.rcard{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;width:100%;text-align:start}
+.rcard .rt{flex:1;min-width:0}.rcard .rt b{display:block;line-height:1.5}.rcard .rt small{color:var(--muted)}
+.rcard.inv{border-color:var(--hi)}
+.pill{display:inline-block;border-radius:999px;padding:0 10px;font-size:.78rem;line-height:1.9;background:var(--chip);color:var(--muted);white-space:nowrap}
+.pill.live{background:var(--bad-soft);color:var(--bad)}.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--hi);color:var(--hi-ink)}
+.rhead{width:100%;max-width:600px;display:flex;align-items:center;gap:10px}
+.rhead h2{flex:1;margin:0;font-size:1.2rem;min-width:0;line-height:1.5}
+.codebox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:2rem;font-weight:800;letter-spacing:.25em;text-align:center;background:var(--paper);border:2px dashed var(--line);border-radius:14px;padding:6px;direction:ltr;margin-bottom:10px}
+.mrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.mrow:first-child{border-top:0}
+.mrow .nm{flex:1;min-width:0;font-weight:600}
+.mrow .btn{padding:4px 12px;font-size:.88rem}
+.rk{width:30px;height:30px;border-radius:9px;background:var(--chip);display:grid;place-items:center;font-weight:800;font-family:system-ui,sans-serif;flex:none}
+.lb .mrow:first-child .rk{background:var(--hi);color:var(--hi-ink)}
+.sc{font-weight:800;font-family:system-ui,sans-serif}
+.gain{color:var(--ok);font-size:.85rem;font-family:system-ui,sans-serif;margin-inline-end:6px}
+.opt.sel{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}
+.opt:disabled{cursor:default}
+.search.plain{background-image:none;padding-inline-start:14px}
+.msg{text-align:center;color:var(--muted);margin:8px 0 0}
+.msg.big{font-size:1.1rem;color:var(--ink);font-weight:700}
+.setup h3{margin:0 0 10px;font-size:1.05rem}
 </style>
 </head>
-<body>
+<body class="on-list">
 <section id="authView" hidden>
   <div class="authcard">
     <div class="top"><h1 class="title"><span data-t="appTitle"></span></h1><button class="iconbtn langbtn" id="langBtn3" type="button" aria-label="Switch language / ބަސް ބަދަލުކުރޭ"></button></div>
@@ -312,7 +343,7 @@ nav.tabs button[aria-current="page"] .ic{background:var(--chip);transform:none}
     <button data-tab="flash"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="14" rx="2.5"/><path d="M8 3h10.5A2.5 2.5 0 0 1 21 5.5V16"/></svg></span><span data-t="tabFlash"></span></button>
     <button data-tab="quiz"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9"/></svg></span><span data-t="tabQuiz"></span></button>
     <button data-tab="match"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/></svg></span><span data-t="tabMatch"></span></button>
-    <button data-tab="group"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M21.5 20a6.5 6.5 0 0 0-3.8-5.9"/></svg></span><span data-t="tabGroup"></span></button>
+    <button data-tab="group"><span class="ic"><span class="badge" id="gBadge" hidden></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M21.5 20a6.5 6.5 0 0 0-3.8-5.9"/></svg></span><span data-t="tabGroup"></span></button>
   </div>
 </nav>
 
@@ -336,13 +367,9 @@ nav.tabs button[aria-current="page"] .ic{background:var(--chip);transform:none}
     </div>
     <div id="pdfBox" hidden>
       <p class="hint" data-t="fileHint"></p>
-      <label class="filebtn" id="dropZone">📄 <span data-t="chooseFile"></span><input type="file" id="pdfFile" multiple accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.xls,.json,image/*,application/pdf" class="sr"></label>
+      <label class="filebtn" id="dropZone">📄 <span data-t="chooseFile"></span><input type="file" id="pdfFile" multiple accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.xls,.json,application/pdf" class="sr"></label>
       <div class="row" style="margin-bottom:10px"><button type="button" class="btn" id="pasteBtn" data-t="pasteBtn"></button><span class="hint" style="margin:0" data-t="pasteHint"></span></div>
       <p class="pstatus" id="pdfStatus" aria-live="polite"></p>
-      <div class="ai-row" id="aiRow" hidden>
-        <button type="button" class="btn" id="aiText" data-t="aiFind"></button>
-        <button type="button" class="btn ghost" id="aiImg" data-t="aiScan" hidden></button>
-      </div>
       <div class="preview" id="pdfPreview" hidden></div>
     </div>
     <div class="row">
@@ -406,10 +433,22 @@ const I18N={
   oneQ:"އެއް ސުވާލު",manyQ:"ގިނަ ސުވާލު",subject:"މާއްދާ / ބައި",subjectPh:"މިސާލު: ސައިންސް",question:"ސުވާލު",answer:"ޖަވާބު",
   bulkHint:"ކޮންމެ ސުވާލެއް ފަށާނީ \"ސ:\" އިން، ޖަވާބު \"ޖ:\" އިން. ސުވާލުތަކުގެ މެދުގައި ހުސް ލައިނެއް ދޫކޮށްލާ. (Q: / A: ވެސް ބޭނުންކުރެވޭނެ)",
   bulkPh:"ސ: ދިވެހިރާއްޖޭގެ ވެރިރަށަކީ ކޮބާ؟\nޖ: މާލެ\n\nސ: 7 × 8 ކިތަކަށް؟\nޖ: 56",
-  fileTab:"ފައިލް",fileHint:"PDF، Word، Excel، ލިޔުން ނުވަތަ ފޮޓޯ ފައިލެއް ހޮވާ، ޑްރެގްކޮށް ބޭއްވާ، ނުވަތަ ކޮޕީކޮށް ޕޭސްޓްކުރޭ. ފެނުނު ސުވާލުތައް ރައްކާކުރުމުގެ ކުރިން ބަލައި ބަދަލުކުރެވޭނެ.",chooseFile:"ފައިލް ހޮވާ ނުވަތަ މިތަނަށް ޑްރެގްކުރޭ",pasteBtn:"📋 ޕޭސްޓްކުރޭ",pasteHint:"ނުވަތަ Ctrl+V އިން ކޮޕީކުރި ފައިލް، ފޮޓޯ ނުވަތަ ލިޔުން ޕޭސްޓްކުރޭ.",
-  reading:"{f} ކިޔަނީ…",fileFound:"{n} ސުވާލު ފެނިއްޖެ ({f} ފައިލް). ބަލާލުމަށްފަހު ރައްކާކުރޭ.",fileNone:"ފައިލް ކިޔައިފި، ނަމަވެސް ސ:/ޖ: ނުވަތަ Q:/A: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު. Claude ލައްވާ ހޯދައިލާ.",imgAdded:"ފޮޓޯ ލިބިއްޖެ. \"✨ ފޮޓޯ / ސަފުހާތައް ކިޔާ\" އަށް ފިތާލާ.",
-  pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔައިލާ.",unsupported:"{f} ކިޔޭކަށް ނެތް. މި ބާވަތުގެ ފައިލް ނުކިޔޭ.",readFail:"{f} ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",pasteFail:"ޕޭސްޓް ނުކުރެވުނު. Ctrl+V ބޭނުންކޮށްލާ.",
-  aiFind:"✨ Claude ލައްވާ ސުވާލު ހޯދާ",aiScan:"✨ ފޮޓޯ / ސަފުހާތައް ކިޔާ",aiWorking:"Claude ސުވާލު ހޯދަނީ… ({i}/{n})",aiDone:"Claude އަށް {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",aiFail:"Claude އަށް ނުކިޔުނު. އަނެއްކާ މަސައްކަތްކޮށްލާ.",aiDenied:"Claude ބޭނުންކުރުމުގެ ހުއްދަ ނުލިބުނު.",aiNothing:"Claude އަށްވެސް ސުވާލެއް ނުފެނުނު.",passPrompt:"Claude ބޭނުންކުރަން ޕާސްކޯޑް ލިޔުއްވާ",addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ ފައިލެއް ހޮވާ",
+  fileTab:"ފައިލް",fileHint:"PDF، Word، Excel، CSV ނުވަތަ ލިޔުމުގެ ފައިލެއް ހޮވާ، ޑްރެގްކޮށް ބޭއްވާ، ނުވަތަ ކޮޕީކޮށް ޕޭސްޓްކުރޭ. ފެނުނު ސުވާލުތައް ރައްކާކުރުމުގެ ކުރިން ބަލައި ބަދަލުކުރެވޭނެ.",chooseFile:"ފައިލް ހޮވާ ނުވަތަ މިތަނަށް ޑްރެގްކުރޭ",pasteBtn:"📋 ޕޭސްޓްކުރޭ",pasteHint:"ނުވަތަ Ctrl+V އިން ކޮޕީކުރި ފައިލް ނުވަތަ ލިޔުން ޕޭސްޓްކުރޭ.",
+  reading:"{f} ކިޔަނީ…",fileFound:"{n} ސުވާލު ފެނިއްޖެ ({f} ފައިލް). ބަލާލުމަށްފަހު ރައްކާކުރޭ.",fileNone:"ފައިލް ކިޔައިފި، ނަމަވެސް ސ:/ޖ:، Q:/A: ނުވަތަ ނަންބަރު ޖެހި ސުވާލު + ޖަވާބު: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު.",
+  pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). މީގެން ސުވާލު ނުކިޔޭނެ.",unsupported:"{f} ކިޔޭކަށް ނެތް. މި ބާވަތުގެ ފައިލް ނުކިޔޭ.",readFail:"{f} ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",pasteFail:"ޕޭސްޓް ނުކުރެވުނު. Ctrl+V ބޭނުންކޮށްލާ.",
+  addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ ފައިލެއް ހޮވާ",
+  gHomeTitle:"ގްރޫޕް މުބާރާތް",gHomeText:"ޕޯޓަލް ބޭނުންކުރާ އެހެން ދަރިވަރުންނާ އެކު ލައިވް މުބާރާތެއް ކުޅޭ. ތިބާ މުބާރާތެއް ހަދައިފިނަމަ ތިބާއަކީ މޮޑަރޭޓަރ.",gCreate:"+ އާ މުބާރާތެއް ހަދާ",codePh:"މުބާރާތުގެ ކޯޑު",gJoinBtn:"ބައިވެރިވާން އެދޭ",
+  gInvites:"ތިބާއަށް ލިބިފައިވާ ދަޢުވަތު",gInvitedBy:"{n} ގެ ދަޢުވަތު",accept:"ގަބޫލުކުރޭ",decline:"ނުގަބޫލުކުރޭ",gMyRooms:"ތިބާގެ މުބާރާތްތައް",noRooms:"އަދި މުބާރާތެއް ނެތް",gHosting:"މޮޑަރޭޓަރ",gPlaying:"ބައިވެރިއެއް",
+  stLobby:"ތައްޔާރުވަނީ",stLive:"ލައިވް",stEnded:"ނިމިއްޖެ",gLocalTitle:"އެއް ޑިވައިސްގައި ޓީމް ގޭމް",gLocalText:"އެއް ފޯނެއް ނުވަތަ ސްކްރީނެއް ވަށައިގެން ޓީމްތަކަށް ބަހާލައިގެން ކުޅޭ.",
+  gNeedAccount:"އޮންލައިން މުބާރާތް ކުޅެވޭނީ ދަސްކުރާ ފޮތެއްގެ އެކައުންޓަކުން ވަދެގެން.",newTitle:"އާ މުބާރާތެއް",rTitle:"މުބާރާތުގެ ނަން",rTitleDef:"{n} ގެ މުބާރާތް",hostPlays:"އަހަރެންވެސް ބައިވެރިއެއްގެ ގޮތުގައި ކުޅެން",makeRoom:"މުބާރާތް ހަދާ",back:"ފަހަތަށް",
+  copyCode:"ކޯޑު ކޮޕީކުރޭ",copied:"ކޮޕީކުރެވިއްޖެ",shareHint:"މި ކޯޑު ދީގެން އެހެން ދަރިވަރުންނަށް ބައިވެރިވާން އެދެވޭނެ. ހުއްދަ ދޭނީ ތިބާ.",inviteTitle:"ދަރިވަރުން ދަޢުވަތުކުރޭ",invitePh:"ނިކްނޭމް ލިޔެ ހޯދާ",invite:"ދަޢުވަތުކުރޭ",noUsers:"އެ ނަމުގައި ދަރިވަރެއް ނުފެނުނު",
+  players:"ބައިވެރިން",sInvited:"ދަޢުވަތުކޮށްފި",sJoined:"ބައިވެރިވެއްޖެ",sRequested:"ބައިވެރިވާން އެދިފައި",sDeclined:"ނުގަބޫލުކުރި",sLeft:"ދޫކޮށްފި",sRemoved:"ވަކިކޮށްފި",sRejected:"ހުއްދަ ނުދެވުނު",
+  approve:"ހުއްދަދޭ",reject:"ނުދޭ",remove:"ވަކިކުރޭ",lock:"🔒 އާ އެދުންތައް ބަންދުކުރޭ",unlock:"🔓 އެދުންތައް ހުޅުވާ",startComp:"▶ މުބާރާތް ފަށާ",needPlayers:"ފެށުމަށް މަދުވެގެން 1 ބައިވެރިއަކު ބައިވެރިވާން ޖެހޭ",
+  deleteRoom:"މުބާރާތް ފޮހެލާ",confirmDelRoom:"މި މުބާރާތް ފޮހެލަންތޯ؟",waitHost:"މޮޑަރޭޓަރ މުބާރާތް ފަށާނެ. މަޑުކުރައްވާ…",waitApprove:"މޮޑަރޭޓަރގެ ހުއްދައަށް މަޑުކުރައްވާ…",youRemoved:"ތިބާ މި މުބާރާތުން ވަކިކޮށްފި.",youRejected:"ތިބާގެ އެދުމަށް ހުއްދަ ނުދެވުނު.",youLeft:"ތިބާ މި މުބާރާތް ދޫކޮށްފި.",
+  leave:"ދޫކޮށްލާ",confirmLeave:"މި މުބާރާތް ދޫކޮށްލަންތޯ؟",answered:"{a} / {n} ޖަވާބުދީފި",lockedIn:"ޖަވާބު ލިބިއްޖެ. އެހެން މީހުންނަށް މަޑުކުރަނީ…",nextQ:"ދެން ސުވާލު ←",skipQ:"ފަހަނައަޅާ",endComp:"މުބާރާތް ނިންމާ",confirmEnd:"މިހާރު މުބާރާތް ނިންމަންތޯ؟",
+  leaderboard:"ޕޮއިންޓް ޓޭބަލް",youGot:"+{n} ޕޮއިންޓް 🎉",youMissed:"މި ފަހަރު ޕޮއިންޓެއް ނުލިބުނު",noAnswer:"ޖަވާބެއް ނުދެވުނު",waitNext:"މޮޑަރޭޓަރ ދެން ސުވާލު ދައްކާނެ…",finalTitle:"މުބާރާތް ނިމުނީ! 🏆",playAgainRoom:"އަލުން ކުޅޭ (ހަމަ ބައިވެރިން)",
+  pts:"ޕޮއިންޓް",newInvite:"{n} ތިބާ މުބާރާތަކަށް ދަޢުވަތުކޮށްފި!",newRequest:"{n} ބައިވެރިވާން އެދެއްޖެ",codeNotFound:"އެ ކޯޑުގައި މުބާރާތެއް ނުފެނުނު",roomClosed:"މި މުބާރާތަށް މިހާރު ބައިވެރިވާން އެދެވޭކަށް ނެތް",requested:"އެދުން ފޮނުވިއްޖެ. މޮޑަރޭޓަރ ހުއްދަދޭންދެން މަޑުކުރައްވާ",
+  actionFail:"ނުކުރެވުނު. އިންޓަނެޓް ބަލާފައި އަނެއްކާ މަސައްކަތްކޮށްލާ",hostLabel:"މޮޑަރޭޓަރ: {n}",youTag:"(ތިބާ)",roomGone:"މި މުބާރާތް ފޮހެލައިފި",modPanel:"މޮޑަރޭޓަރ ޕެނަލް",correctLabel:"ރަނގަޅު ޖަވާބު",noPlayersYet:"އަދި ބައިވެރިއެއް ނެތް",s10:"10 ސިކުންތު",s20:"20 ސިކުންތު",
   authText:"ނިކްނޭމަކާއި PIN އެއް ބޭނުންކޮށް ތިބާގެ އަމިއްލަ ދަސްކުރާ ފޮތެއް ހަދާ. އެ ފޮތަށް ކޮންމެ ޑިވައިސްއަކުން ވަދެވޭނެ.",signIn:"ވަދޭ",newBook:"އާ ފޮތެއް ހަދާ",nick:"ނިކްނޭމް",pin:"PIN (4 އިން 6 އަށް ނަންބަރު)",pin2:"PIN އަލުން ލިޔޭ",create:"ފޮތް ހަދާ",
   localOnly:"އެކައުންޓެއް ނެތި، މި ޑިވައިސްގައި ހަމައެކަނި ބޭނުންކުރޭ",errNick:"ނިކްނޭމް ވާންވާނީ 3 އަކުރާއި 20 އަކުރާ ދެމެދު",errPin:"PIN ގައި ހުންނަން ޖެހޭނީ 4 އިން 6 އަށް ނަންބަރު",errPin2:"ދެ PIN އެއްގޮތެއް ނޫން",
   errTaken:"މި ނިކްނޭމް ކުރިން ބޭނުންކޮށްފި. އެހެން ނަމެއް ހޮވާ",errLogin:"ނިކްނޭމް ނުވަތަ PIN ރަނގަޅެއް ނޫން",errMany:"ގިނަ ފަހަރު މަސައްކަތްކުރީ. ކުޑަ ހިނދުކޮޅަކަށްފަހު އަލުން މަސައްކަތްކުރޭ",errNet:"އިންޓަނެޓް ކަނެކްޝަން ބަލާލާ",errSetup:"Firebase ގައި Email/Password ސައިން އިން ހުޅުވާފައެއް ނުވޭ (އެޑްމިން)",
@@ -442,10 +481,22 @@ const I18N={
   oneQ:"One question",manyQ:"Many questions",subject:"Subject / topic",subjectPh:"e.g. Science",question:"Question",answer:"Answer",
   bulkHint:"Start each question with \"Q:\" and each answer with \"A:\". Leave a blank line between questions. (ސ: / ޖ: also work)",
   bulkPh:"Q: What is the capital of the Maldives?\nA: Malé\n\nQ: What is 7 × 8?\nA: 56",
-  fileTab:"File",fileHint:"Choose, drag in, or copy & paste a PDF, Word, Excel, text or image file. You can check and edit what's found before saving.",chooseFile:"Choose files or drag them here",pasteBtn:"📋 Paste",pasteHint:"Or press Ctrl+V to paste a copied file, image or text.",
-  reading:"Reading {f}…",fileFound:"Found {n} questions in {f} file(s). Check them, then save.",fileNone:"Files read, but no questions in Q:/A: format. Try finding them with Claude.",imgAdded:"Image added. Tap \"✨ Read images / pages\".",
-  pdfNoText:"This PDF has no text (it looks scanned). Try reading the pages as images.",unsupported:"Can't read {f} — this file type isn't supported.",readFail:"Couldn't read {f}. Check the file.",pasteFail:"Couldn't paste. Try Ctrl+V.",
-  aiFind:"✨ Find Q&A with Claude",aiScan:"✨ Read images / pages",aiWorking:"Claude is finding questions… ({i}/{n})",aiDone:"Claude found {n} questions. Check them, then save.",aiFail:"Claude couldn't read it. Try again.",aiDenied:"Permission to use Claude wasn't given.",aiNothing:"Claude didn't find any questions either.",passPrompt:"Enter the passcode to use Claude",addSelected:"Add {n} selected questions",pickPdf:"Choose a file first",
+  fileTab:"File",fileHint:"Choose, drag in, or copy & paste a PDF, Word, Excel, CSV or text file. You can check and edit what's found before saving.",chooseFile:"Choose files or drag them here",pasteBtn:"📋 Paste",pasteHint:"Or press Ctrl+V to paste a copied file or text.",
+  reading:"Reading {f}…",fileFound:"Found {n} questions in {f} file(s). Check them, then save.",fileNone:"Files read, but no questions found in Q:/A:, ސ:/ޖ: or numbered question + Answer: format.",
+  pdfNoText:"This PDF has no text (it looks scanned), so questions can't be read from it.",unsupported:"Can't read {f} — this file type isn't supported.",readFail:"Couldn't read {f}. Check the file.",pasteFail:"Couldn't paste. Try Ctrl+V.",
+  addSelected:"Add {n} selected questions",pickPdf:"Choose a file first",
+  gHomeTitle:"Group competition",gHomeText:"Run a live competition with other students who use the portal. Whoever creates a competition is its moderator.",gCreate:"+ Create a competition",codePh:"Competition code",gJoinBtn:"Request to join",
+  gInvites:"Invitations for you",gInvitedBy:"Invited by {n}",accept:"Accept",decline:"Decline",gMyRooms:"Your competitions",noRooms:"No competitions yet",gHosting:"Moderator",gPlaying:"Player",
+  stLobby:"Getting ready",stLive:"Live",stEnded:"Finished",gLocalTitle:"Team game on one device",gLocalText:"Split into teams around one phone or screen.",
+  gNeedAccount:"Online competitions need you to sign in to a study book.",newTitle:"New competition",rTitle:"Competition name",rTitleDef:"{n}'s competition",hostPlays:"I'll play too, as a player",makeRoom:"Create competition",back:"Back",
+  copyCode:"Copy code",copied:"Copied",shareHint:"Other students can request to join with this code. You approve who gets in.",inviteTitle:"Invite students",invitePh:"Search by nickname",invite:"Invite",noUsers:"No students found with that name",
+  players:"Players",sInvited:"Invited",sJoined:"Joined",sRequested:"Wants to join",sDeclined:"Declined",sLeft:"Left",sRemoved:"Removed",sRejected:"Not approved",
+  approve:"Approve",reject:"Reject",remove:"Remove",lock:"🔒 Lock new requests",unlock:"🔓 Open for requests",startComp:"▶ Start competition",needPlayers:"At least 1 player must join before you can start",
+  deleteRoom:"Delete competition",confirmDelRoom:"Delete this competition?",waitHost:"Waiting for the moderator to start…",waitApprove:"Waiting for the moderator to approve you…",youRemoved:"You've been removed from this competition.",youRejected:"Your request wasn't approved.",youLeft:"You left this competition.",
+  leave:"Leave",confirmLeave:"Leave this competition?",answered:"{a} / {n} answered",lockedIn:"Answer locked in. Waiting for the others…",nextQ:"Next question →",skipQ:"Skip",endComp:"End competition",confirmEnd:"End the competition now?",
+  leaderboard:"Leaderboard",youGot:"+{n} points 🎉",youMissed:"No points this time",noAnswer:"No answer",waitNext:"The moderator will show the next question…",finalTitle:"Competition over! 🏆",playAgainRoom:"Play again (same players)",
+  pts:"pts",newInvite:"{n} invited you to a competition!",newRequest:"{n} wants to join",codeNotFound:"No competition with that code",roomClosed:"This competition isn't taking requests right now",requested:"Request sent. Wait for the moderator to approve you.",
+  actionFail:"That didn't work. Check your internet and try again.",hostLabel:"Moderator: {n}",youTag:"(you)",roomGone:"This competition was deleted",modPanel:"Moderator panel",correctLabel:"Correct answer",noPlayersYet:"No players yet",s10:"10 seconds",s20:"20 seconds",
   authText:"Create your own study book with a nickname and a PIN, then open it on any device.",signIn:"Sign in",newBook:"New study book",nick:"Nickname",pin:"PIN (4–6 digits)",pin2:"Repeat PIN",create:"Create book",
   localOnly:"Use without an account (this device only)",errNick:"Nickname must be 3–20 characters",errPin:"PIN must be 4–6 digits",errPin2:"The two PINs don't match",
   errTaken:"That nickname is already taken. Choose another.",errLogin:"Nickname or PIN is incorrect",errMany:"Too many tries. Wait a little and try again.",errNet:"Check your internet connection",errSetup:"Email/Password sign-in isn't enabled in Firebase (admin)",
@@ -562,7 +613,7 @@ async function connectCloud(){
 
 /* ---------- tabs ---------- */
 function go(tab,keep){
-  current=tab;
+  current=tab;document.body.classList.toggle("on-list",tab==="list");
   $$("nav.tabs button").forEach(b=>{if(b.dataset.tab===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   $$(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+tab));
   stopTimers();
@@ -677,7 +728,7 @@ $("#sampleBtn").onclick=()=>persistMany(t("sampleSet").map((r,i)=>({id:uid(),sub
 /* ---------- File import (PDF, Word, Excel, text, images) ---------- */
 const CDN="https://cdnjs.cloudflare.com/ajax/libs/";
 const PDFJS=CDN+"pdf.js/3.11.174/";
-let pdfRows=[],srcText="",srcPdfs=[],srcImages=[],fileCount=0,sampleCap=null,sampleTried=false,hostedAI=null;
+let pdfRows=[],srcText="",fileCount=0;
 function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]'))return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
 async function loadPdfJs(){
   if(!window.pdfjsLib)await loadScript(PDFJS+"pdf.min.js");
@@ -685,47 +736,13 @@ async function loadPdfJs(){
   window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";return window.pdfjsLib;
 }
 const inClaude=()=>!!(window.claude&&window.claude.use);
-async function getSample(){
-  if(sampleTried)return sampleCap;sampleTried=true;
-  try{sampleCap=inClaude()?await claude.use("sample"):null}catch(e){sampleCap=null}
-  return sampleCap;
-}
-/* AI availability: Claude artifact runtime, or the /api/claude function when hosted on Vercel */
-async function aiInfo(){
-  if(inClaude()){const s=await getSample();if(!s)return null;let lim=null;try{lim=await s.limits()}catch(e){}return{images:!!(lim&&lim.images)}}
-  if(hostedAI!==null)return hostedAI;
-  try{const r=await fetch("/api/claude");const j=await r.json();hostedAI=j&&j.ok?{images:true}:false}catch(e){hostedAI=false}
-  return hostedAI||null;
-}
-function blobToB64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(b)})}
-function parseJSONText(txt){const c=String(txt||"").replace(/```json|```/g,"").trim();const a=c.indexOf("["),b=c.lastIndexOf("]");return JSON.parse(a>=0&&b>a?c.slice(a,b+1):c)}
-async function aiJSON(prompt,img){
-  if(inClaude()){const s=await getSample();return s.json(prompt,img?{images:[img],modelTier:"default"}:{modelTier:"default"})}
-  const body={prompt};if(img)body.image={media_type:img.type||"image/jpeg",data:await blobToB64(img)};
-  for(let tries=0;tries<2;tries++){
-    let pass="";try{pass=localStorage.getItem("dv-study-pass")||""}catch(e){}
-    const r=await fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json","x-passcode":pass},body:JSON.stringify(body)});
-    if(r.status===401){const p=window.prompt(t("passPrompt"));if(!p)throw{code:"not_granted"};try{localStorage.setItem("dv-study-pass",p)}catch(e){}continue}
-    if(!r.ok)throw new Error("api "+r.status);
-    return parseJSONText((await r.json()).text);
-  }
-  throw{code:"not_granted"};
-}
-async function shrink(blob,max=1600){
-  try{
-    const bmp=await createImageBitmap(blob);const k=Math.min(1,max/Math.max(bmp.width,bmp.height));
-    const cv=document.createElement("canvas");cv.width=Math.round(bmp.width*k);cv.height=Math.round(bmp.height*k);
-    const ctx=cv.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(bmp,0,0,cv.width,cv.height);
-    return await new Promise(r=>cv.toBlob(r,"image/jpeg",.85));
-  }catch(e){return blob}
-}
 function pStatus(msg,err){const el=$("#pdfStatus");el.textContent=msg||"";el.classList.toggle("err",!!err)}
 function updateSaveLabel(){
   const b=$("#saveBtn");
   if(addMode==="pdf"){const n=pdfRows.filter(r=>r.on).length;b.textContent=t("addSelected",{n});b.disabled=!n}
   else{b.textContent=t("save");b.disabled=false}
 }
-function resetPdf(){pdfRows=[];srcText="";srcPdfs=[];srcImages=[];fileCount=0;$("#pdfFile").value="";pStatus("");$("#aiRow").hidden=true;$("#pdfPreview").hidden=true;$("#pdfPreview").innerHTML="";updateSaveLabel()}
+function resetPdf(){pdfRows=[];srcText="";fileCount=0;$("#pdfFile").value="";pStatus("");$("#pdfPreview").hidden=true;$("#pdfPreview").innerHTML="";updateSaveLabel()}
 function renderPreview(){
   const box=$("#pdfPreview");box.hidden=!pdfRows.length;
   box.innerHTML=pdfRows.map((r,i)=>`<div class="prow${r.on?"":" off"}" data-i="${i}"><input type="checkbox" ${r.on?"checked":""} aria-label="${i+1}">
@@ -772,11 +789,10 @@ async function readOne(f){
   if(type==="application/pdf"||ext==="pdf"){
     const lib=await loadPdfJs();const doc=await lib.getDocument({data:await f.arrayBuffer(),isEvalSupported:false}).promise;
     const pages=[];for(let i=1;i<=doc.numPages;i++)pages.push((await pageLines(await doc.getPage(i))).join("\n"));
-    const txt=pages.join("\n\n");srcPdfs.push(doc);
+    const txt=pages.join("\n\n");
     if(txt.replace(/\s/g,"").length<20)return{note:"pdfNoText"};
     srcText+="\n\n"+txt;addRows(parseLoose(txt));return{};
   }
-  if(type.startsWith("image/")){srcImages.push(await shrink(f));return{note:"imgAdded"}}
   if(ext==="docx"){
     await loadScript(CDN+"mammoth/1.6.0/mammoth.browser.min.js");
     const r=await window.mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()});
@@ -803,14 +819,12 @@ async function handleFiles(files,pastedText){
   let lastNote=null,err=false;
   for(const f of files){
     fileCount++;
-    try{const r=await readOne(f);if(r.note){lastNote=r.note==="unsupported"?t("unsupported",{f:f.name}):t(r.note);err=r.note!=="imgAdded"}}
+    try{const r=await readOne(f);if(r.note){lastNote=r.note==="unsupported"?t("unsupported",{f:f.name}):t(r.note);err=true}}
     catch(e){console.error(e);lastNote=t("readFail",{f:f.name||"file"});err=true}
   }
   if(pastedText){fileCount++;srcText+="\n\n"+pastedText;addText(pastedText)}
   renderPreview();
   pStatus(pdfRows.length?t("fileFound",{n:pdfRows.length,f:fileCount}):(lastNote||t("fileNone")),!pdfRows.length&&err);
-  const ai=await aiInfo();
-  if(ai){$("#aiRow").hidden=false;$("#aiText").hidden=!srcText.trim();$("#aiImg").hidden=!(ai.images&&(srcImages.length||srcPdfs.length))}
 }
 $("#pdfFile").addEventListener("change",e=>{handleFiles(e.target.files);e.target.value=""});
 const dz=$("#dropZone");
@@ -828,64 +842,9 @@ document.addEventListener("paste",e=>{
   handleFiles(files,files.length?"":cd.getData("text/plain"));
 });
 $("#pasteBtn").onclick=async()=>{
-  try{
-    const items=await navigator.clipboard.read();const files=[];let txt="";
-    for(const it of items){
-      const img=it.types.find(x=>x.startsWith("image/"));
-      if(img){const b=await it.getType(img);files.push(new File([b],"pasted."+img.split("/")[1],{type:img}));continue}
-      if(it.types.includes("text/plain"))txt+=await (await it.getType("text/plain")).text();
-    }
-    if(!files.length&&!txt)throw 0;handleFiles(files,txt);
-  }catch(e){
-    try{const txt=await navigator.clipboard.readText();if(txt){handleFiles([],txt);return}}catch(e2){}
-    toast(t("pasteFail"));
-  }
+  try{const txt=await navigator.clipboard.readText();if(txt){handleFiles([],txt);return}}catch(e){}
+  toast(t("pasteFail"));
 };
-
-const AI_RULES='You turn study material into flashcards. The material may be in Dhivehi (Thaana script), English, or both. '+
- 'If it already contains questions with answers, return every pair with its original wording and language. '+
- 'If it is notes without questions, write clear study questions whose answers come only from the material, in the same language as the material. '+
- 'Never add facts that are not in the material. Return ONLY a JSON array like [{"q":"question","a":"answer"}], or [] if nothing is usable.';
-function normAI(v){const arr=Array.isArray(v)?v:(v&&Array.isArray(v.items)?v.items:(v&&Array.isArray(v.cards)?v.cards:[]));
-  return arr.filter(x=>x&&x.q&&x.a).map(x=>({q:String(x.q).trim(),a:String(x.a).trim(),on:true}))}
-async function pdfPageImages(limit){
-  const out=[];
-  for(const doc of srcPdfs){for(let i=1;i<=doc.numPages&&out.length<limit;i++){
-    const page=await doc.getPage(i);const vp=page.getViewport({scale:1.6});
-    const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;
-    await page.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
-    out.push(await new Promise(r=>cv.toBlob(r,"image/jpeg",.85)));
-  }}
-  return out;
-}
-async function runAI(useImages){
-  if(!(await aiInfo()))return;
-  [$("#aiText"),$("#aiImg"),$("#saveBtn")].forEach(b=>b.disabled=true);
-  const found=[];
-  try{
-    if(useImages){
-      const imgs=srcImages.slice(0,15).concat(await pdfPageImages(Math.max(0,15-srcImages.length)));
-      for(let i=0;i<imgs.length;i++){
-        pStatus(t("aiWorking",{i:i+1,n:imgs.length}));
-        found.push(...normAI(await aiJSON(AI_RULES+"\n\nThe material is the attached image. Read the text carefully.",imgs[i])));
-      }
-    }else{
-      const chunks=[];for(let i=0;i<srcText.length&&chunks.length<10;i+=9000)chunks.push(srcText.slice(i,i+9000));
-      for(let i=0;i<chunks.length;i++){
-        pStatus(t("aiWorking",{i:i+1,n:chunks.length}));
-        found.push(...normAI(await aiJSON(AI_RULES+"\n\nMATERIAL (extracted from files, line order may be imperfect):\n"+chunks[i])));
-      }
-    }
-    pdfRows=[];addRows(found);renderPreview();
-    pStatus(pdfRows.length?t("aiDone",{n:pdfRows.length}):t("aiNothing"),!pdfRows.length);
-  }catch(err){
-    console.error(err);if(found.length){pdfRows=[];addRows(found);renderPreview()}
-    pStatus(err&&err.code==="not_granted"?t("aiDenied"):t("aiFail"),true);
-  }finally{$("#aiText").disabled=false;$("#aiImg").disabled=false;updateSaveLabel()}
-}
-$("#aiText").onclick=()=>runAI(false);
-$("#aiImg").onclick=()=>runAI(true);
-
 /* ---------- flashcards ---------- */
 let fDeck=[],fIdx=0,fOnlyNew=false;
 function flashStart(){
@@ -988,17 +947,17 @@ function matchRender(){
 /* ---------- group ---------- */
 let gp=null,gpTimer=null;
 function stopTimers(){clearInterval(gpTimer);gpTimer=null;clearInterval(mgTick)}
-function groupSetup(){
+function localGroupSetup(){
   const st=$("#groupStage");
   if(cards.length<1){st.innerHTML=needCards(1);return}
-  st.innerHTML=`<div class="setup"><h2>${t("groupTitle")}</h2><p>${t("groupText")}</p>
+  st.innerHTML=`<div class="rhead"><button class="btn ghost" id="gpBack">${t("back")}</button></div><div class="setup"><h2>${t("groupTitle")}</h2><p>${t("groupText")}</p>
     <label class="f">${t("teamCount")}<select id="gpN"><option>2</option><option>3</option><option>4</option></select></label>
     <div class="teams" id="gpNames"></div>${subjectSelect("gpSubj")}
     <label class="f">${t("timePerQ")}<select id="gpSec"><option value="15">${t("s15")}</option><option value="30" selected>${t("s30")}</option><option value="60">${t("s60")}</option></select></label>
     <label class="f">${t("qPerTeam")}<select id="gpR"><option>3</option><option selected>5</option><option>10</option></select></label>
     <button class="btn primary big" id="gpGo">${t("startGame")}</button></div>`;
   const names=()=>{const n=+$("#gpN").value;$("#gpNames").innerHTML=Array.from({length:n},(_,i)=>`<label class="f">${t("teamName",{n:i+1})}<input data-team dir="auto" value="${esc(t("teamDefaults")[i])}"></label>`).join("")};
-  names();$("#gpN").onchange=names;
+  names();$("#gpN").onchange=names;$("#gpBack").onclick=groupHome;
   $("#gpGo").onclick=()=>{
     const teams=$$("[data-team]").map((inp,k)=>({name:inp.value.trim()||t("team",{n:k+1}),score:0}));
     const pool=bySubj($("#gpSubj").value);
@@ -1016,7 +975,7 @@ function groupQ(){
     st.innerHTML=`${board(-1)}<div class="setup center"><p>${t("gameOver")}</p><div class="score">🏆</div>
       <h2>${win.length>1?t("tie")+win.map(x=>esc(x.name)).join(t("sep")):t("wins",{t:esc(win[0].name)})}</h2>
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" id="gpAgain">${t("again")}</button></div></div>`;
-    $("#gpAgain").onclick=groupSetup;return;
+    $("#gpAgain").onclick=localGroupSetup;return;
   }
   const turn=gp.i%gp.teams.length,c=gp.qs[gp.i];let left=gp.sec;
   st.innerHTML=`${board(turn)}<div class="turnline">${t("turnOf",{t:esc(gp.teams[turn].name)})}</div>
@@ -1126,17 +1085,309 @@ async function startFirebase(){
       try{const d=await fs.collection("users").doc(u.uid).get();if(d.exists&&d.data().nick)fbNick=d.data().nick}catch(e){}
       pendingNick="";
       mode="db";dbRef=fs.collection("users").doc(u.uid).collection("cards");cards=[];renderAllStatic();updateAccountUI();
+      if(fbNick)fs.collection("directory").doc(u.uid).set({nick:fbNick,nickLower:fbNick.toLowerCase()},{merge:true}).catch(e=>console.error(e));
+      startRoomsWatch();if(current==="group")groupHome();
       fbUnsub=dbRef.onSnapshot(snap=>{
         cards=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.created||0)-(b.created||0));
         renderAllStatic();if(current!=="list"&&!document.querySelector(".view.on .qcard, .view.on .flash, .view.on .mgrid"))go(current,true);
       },e=>{console.error(e);toast(t("errNet"))});
       if(pendingCopy){const list=pendingCopy;pendingCopy=null;for(const c of list){try{await dbRef.doc(c.id).set(clean(c))}catch(e){}}}
     }else{
+      stopRoomsWatch();
       mode="local";dbRef=null;fbNick="";loadLocal();renderAllStatic();updateAccountUI();go("list",true);
       let lo=false;try{lo=localStorage.getItem("dv-study-localonly")==="1"}catch(e){}
       showAuth(!lo);
     }
   });
+}
+
+/* ---------- Online group competitions (Firebase) ---------- */
+let myRooms=[],roomsUnsub=null,roomId=null,room=null,roomUnsub=null,ansUnsub=null,ansKey="",answers={},roomTick=null,roomKey="",revealKey="",seenNotes=new Set(),firstRooms=true,searchT=null;
+const FV=()=>firebase.firestore.FieldValue;
+const meUid=()=>fbUser?fbUser.uid:null;
+const tsMs=x=>x&&x.toMillis?x.toMillis():(typeof x==="number"?x:0);
+const roomRef=()=>fb.fs.collection("rooms").doc(roomId);
+const statusPill=st=>st==="live"?`<span class="pill live">● ${t("stLive")}</span>`:st==="ended"?`<span class="pill">${t("stEnded")}</span>`:`<span class="pill ok">${t("stLobby")}</span>`;
+const mStatusLabel={invited:"sInvited",joined:"sJoined",requested:"sRequested",declined:"sDeclined",left:"sLeft",removed:"sRemoved",rejected:"sRejected"};
+async function act(fn){try{await fn()}catch(e){console.error(e);toast(t("actionFail"))}}
+function genCode(){const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let c="";const r=crypto.getRandomValues(new Uint32Array(6));for(const n of r)c+=A[n%A.length];return c}
+function joinedPlayers(r){return Object.entries((r||room).members||{}).filter(([,m])=>m.status==="joined").map(([uid,m])=>({uid,...m}))}
+
+function startRoomsWatch(){
+  if(roomsUnsub)roomsUnsub();firstRooms=true;
+  roomsUnsub=fb.fs.collection("rooms").where("memberIds","array-contains",meUid()).limit(40).onSnapshot(snap=>{
+    myRooms=snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:"estimate"})}));
+    const uid=meUid();
+    myRooms.forEach(r=>{
+      if(r.status==="ended")return;
+      const me=r.members&&r.members[uid];
+      if(me&&me.status==="invited"){const k="i"+r.id;if(!seenNotes.has(k)){seenNotes.add(k);if(!firstRooms)toast(t("newInvite",{n:r.hostNick}))}}
+      if(r.hostUid===uid)Object.entries(r.members||{}).forEach(([u,m])=>{if(m.status==="requested"){const k="r"+r.id+u;if(!seenNotes.has(k)){seenNotes.add(k);if(!firstRooms)toast(t("newRequest",{n:m.nick}))}}});
+    });
+    firstRooms=false;updateBadge();renderRoomLists();
+  },e=>console.error(e));
+}
+function stopRoomsWatch(){if(roomsUnsub)roomsUnsub();roomsUnsub=null;myRooms=[];stopRoomListeners();updateBadge()}
+function stopRoomListeners(){if(roomUnsub)roomUnsub();roomUnsub=null;if(ansUnsub)ansUnsub();ansUnsub=null;ansKey="";answers={};clearInterval(roomTick);roomTick=null;room=null;roomId=null;roomKey=""}
+function updateBadge(){
+  const uid=meUid();let n=0;
+  if(uid)myRooms.forEach(r=>{if(r.status==="ended")return;const me=r.members&&r.members[uid];if(me&&me.status==="invited")n++;if(r.hostUid===uid)n+=Object.values(r.members||{}).filter(m=>m.status==="requested").length});
+  const b=$("#gBadge");b.hidden=!n;b.textContent=n;
+}
+
+function groupSetup(){if(roomId){roomKey="";if(room)renderRoom()}else groupHome()}
+function groupHome(){
+  stopRoomListeners();stopTimers();
+  const st=$("#groupStage");let html="";
+  if(fbOn()){
+    html+=fbUser?`<div class="setup"><h2>${t("gHomeTitle")}</h2><p>${t("gHomeText")}</p>
+      <button class="btn primary big full" id="gNew">${t("gCreate")}</button>
+      <div class="row" style="margin-top:12px"><input class="search plain num" id="gCode" maxlength="6" placeholder="${t("codePh")}" style="text-transform:uppercase;direction:ltr"><button class="btn" id="gJoin">${t("gJoinBtn")}</button></div></div>
+      <div class="glists" id="gLists"></div>`
+      :`<div class="setup"><h2>${t("gHomeTitle")}</h2><p>${t("gNeedAccount")}</p><button class="btn primary" id="gSignIn">${t("signInMenu")}</button></div>`;
+  }
+  html+=`<div class="setup"><h2>${t("gLocalTitle")}</h2><p>${t("gLocalText")}</p><button class="btn big" id="gLocal">${t("start")}</button></div>`;
+  st.innerHTML=html;
+  $("#gLocal").onclick=localGroupSetup;
+  if($("#gSignIn"))$("#gSignIn").onclick=()=>{try{localStorage.removeItem("dv-study-localonly")}catch(e){}setAuthMode("in");showAuth(true)};
+  if($("#gNew"))$("#gNew").onclick=newRoomForm;
+  if($("#gJoin")){$("#gJoin").onclick=joinByCode;$("#gCode").addEventListener("keydown",e=>{if(e.key==="Enter")joinByCode()})}
+  renderRoomLists();
+}
+function renderRoomLists(){
+  const el=$("#gLists");if(!el||!fbUser)return;const uid=meUid();
+  const invites=myRooms.filter(r=>r.status!=="ended"&&r.members&&r.members[uid]&&r.members[uid].status==="invited");
+  const mine=myRooms.filter(r=>{const s=r.members&&r.members[uid]&&r.members[uid].status;return r.hostUid===uid||s==="joined"||s==="requested"})
+    .sort((a,b)=>(a.status==="ended")-(b.status==="ended")||tsMs(b.created)-tsMs(a.created)).slice(0,12);
+  let h="";
+  if(invites.length){h+=`<p class="gsec">${t("gInvites")}</p>`+invites.map(r=>`<div class="rcard inv"><div class="rt"><b dir="auto">${esc(r.title)}</b><small>${t("gInvitedBy",{n:esc(r.hostNick)})}</small></div>
+    <button class="btn ok" data-acc="${r.id}">${t("accept")}</button><button class="btn ghost" data-dec="${r.id}">${t("decline")}</button></div>`).join("")}
+  h+=`<p class="gsec">${t("gMyRooms")}</p>`;
+  h+=mine.length?mine.map(r=>{const host=r.hostUid===uid,me=r.members&&r.members[uid];const req=host?Object.values(r.members||{}).filter(m=>m.status==="requested").length:0;
+    return `<button class="rcard" data-open="${r.id}"><div class="rt"><b dir="auto">${esc(r.title)}</b><small>${host?t("gHosting"):(me&&me.status==="requested"?t("sRequested"):t("gPlaying"))} · ${joinedPlayers(r).length} ${t("players")}</small></div>${req?`<span class="pill warn">${req} ${t("sRequested")}</span>`:""}${statusPill(r.status)}</button>`}).join("")
+    :`<p class="msg">${t("noRooms")}</p>`;
+  el.innerHTML=h;
+  el.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openRoom(b.dataset.open));
+  el.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>act(async()=>{await fb.fs.collection("rooms").doc(b.dataset.acc).update({["members."+uid+".status"]:"joined"});openRoom(b.dataset.acc)}));
+  el.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>act(()=>fb.fs.collection("rooms").doc(b.dataset.dec).update({["members."+uid+".status"]:"declined"})));
+}
+function newRoomForm(){
+  const st=$("#groupStage");
+  if(cards.length<2){st.innerHTML=`<div class="rhead"><button class="btn ghost" id="rnBack">${t("back")}</button></div>`+needCards(2);$("#rnBack").onclick=groupHome;return}
+  st.innerHTML=`<div class="rhead"><button class="btn ghost" id="rnBack">${t("back")}</button></div>
+   <div class="setup"><h2>${t("newTitle")}</h2>
+   <label class="f">${t("rTitle")}<input id="rnTitle" dir="auto" maxlength="60" value="${esc(t("rTitleDef",{n:fbNick}))}"></label>
+   ${subjectSelect("rnSubj")}
+   <label class="f">${t("qCount")}<select id="rnN"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></label>
+   <label class="f">${t("timePerQ")}<select id="rnSec"><option value="10">${t("s10")}</option><option value="20" selected>${t("s20")}</option><option value="30">${t("s30")}</option><option value="60">${t("s60")}</option></select></label>
+   <label class="toggle" style="margin-bottom:16px"><input type="checkbox" id="rnPlay"> ${t("hostPlays")}</label>
+   <button class="btn primary big full" id="rnGo">${t("makeRoom")}</button></div>`;
+  $("#rnBack").onclick=groupHome;
+  $("#rnGo").onclick=()=>act(async()=>{
+    const pool=bySubj($("#rnSubj").value);if(pool.length<2){toast(t("fewSubj"));return}
+    const qs=shuffle(pool).slice(0,+$("#rnN").value).map(c=>{
+      const others=shuffle([...new Set(cards.filter(x=>x.id!==c.id&&x.a!==c.a).map(x=>x.a))]).slice(0,3);
+      const opts=shuffle([c.a,...others]);return{q:c.q,opts,ans:opts.indexOf(c.a)};
+    });
+    const uid=meUid(),members={};
+    if($("#rnPlay").checked)members[uid]={nick:fbNick,status:"joined",score:0,last:0};
+    $("#rnGo").disabled=true;
+    const ref=await fb.fs.collection("rooms").add({title:$("#rnTitle").value.trim()||t("rTitleDef",{n:fbNick}),code:genCode(),hostUid:uid,hostNick:fbNick,
+      status:"lobby",locked:false,qs,qi:0,round:0,phase:"question",qAt:null,secs:+$("#rnSec").value,members,memberIds:[uid],created:FV().serverTimestamp()});
+    openRoom(ref.id);
+  });
+}
+async function joinByCode(){
+  const code=($("#gCode").value||"").trim().toUpperCase();if(code.length<4)return;
+  await act(async()=>{
+    const q=await fb.fs.collection("rooms").where("code","==",code).limit(1).get();
+    if(q.empty){toast(t("codeNotFound"));return}
+    const d=q.docs[0],r=d.data(),uid=meUid(),me=r.members&&r.members[uid];
+    if(r.hostUid===uid||(me&&["joined","requested","invited"].includes(me.status))){openRoom(d.id);return}
+    if(r.status!=="lobby"||r.locked||me){toast(t("roomClosed"));return}
+    await d.ref.update({["members."+uid]:{nick:fbNick,status:"requested",score:0,last:0},memberIds:FV().arrayUnion(uid)});
+    toast(t("requested"));openRoom(d.id);
+  });
+}
+
+function openRoom(id){
+  stopRoomListeners();stopTimers();roomId=id;
+  $("#groupStage").innerHTML=`<p class="msg">…</p>`;
+  roomUnsub=roomRef().onSnapshot(snap=>{
+    if(!snap.exists){toast(t("roomGone"));groupHome();return}
+    room={id:snap.id,...snap.data({serverTimestamps:"estimate"})};
+    syncAnswers();if(current==="group")renderRoom();
+  },e=>{console.error(e);toast(t("actionFail"))});
+  roomTick=setInterval(tickRoom,250);
+}
+function syncAnswers(){
+  const k=room.status==="live"?room.round+"_"+room.qi:"";if(k===ansKey)return;
+  if(ansUnsub)ansUnsub();ansUnsub=null;answers={};ansKey=k;if(!k)return;
+  ansUnsub=roomRef().collection("answers").where("round","==",room.round).where("qi","==",room.qi).onSnapshot(s=>{
+    answers={};s.forEach(d=>{const a=d.data();answers[a.uid]=a});if(current==="group")renderRoomDynamic();
+  },e=>console.error(e));
+}
+function lbBoard(rows,showGain){
+  const uid=meUid();
+  return rows.length?rows.sort((a,b)=>(b.score||0)-(a.score||0)).map((m,i)=>`<div class="mrow"><span class="rk">${i+1}</span><span class="nm" dir="auto">${esc(m.nick)} ${m.uid===uid?t("youTag"):""}</span>${showGain&&m.last?`<span class="gain">+${m.last}</span>`:""}<span class="sc">${m.score||0}</span></div>`).join("")
+    :`<p class="msg">${t("noPlayersYet")}</p>`;
+}
+function renderRoom(){
+  if(!room)return;
+  const uid=meUid(),host=room.hostUid===uid,me=room.members&&room.members[uid],ms=me?me.status:"";
+  const key=[room.status,room.phase,room.qi,room.round,host,ms,lang].join("|");
+  if(key!==roomKey){roomKey=key;renderRoomSkeleton(host,ms)}
+  renderRoomDynamic();
+}
+function renderRoomSkeleton(host,ms){
+  const st=$("#groupStage"),r=room;
+  let h=`<div class="rhead"><button class="btn ghost" id="rmBack">${t("back")}</button><h2 dir="auto">${esc(r.title)}</h2>${statusPill(r.status)}</div>`;
+  const q=r.qs[r.qi]||{q:"",opts:[],ans:0};
+  if(!host&&["removed","rejected","left","declined"].includes(ms)){
+    h+=`<div class="setup center"><p class="msg big">${t(ms==="removed"?"youRemoved":ms==="rejected"?"youRejected":"youLeft")}</p></div>`;
+    st.innerHTML=h;$("#rmBack").onclick=groupHome;return;
+  }
+  if(r.status==="lobby"){
+    if(host){
+      h+=`<div class="setup"><h3>${t("modPanel")}</h3><div class="codebox">${esc(r.code)}</div><p>${t("shareHint")}</p>
+        <div class="row"><button class="btn" id="rmCopy">${t("copyCode")}</button><button class="btn" id="rmLock"></button></div></div>
+        <div class="setup"><h3>${t("inviteTitle")}</h3><input class="search full" id="rmSearch" dir="auto" placeholder="${t("invitePh")}"><div id="rmResults" style="margin-top:8px"></div></div>
+        <div class="setup"><h3>${t("players")}</h3><div id="rmMembers"></div></div>
+        <div class="row" style="width:100%;max-width:600px"><button class="btn primary big" id="rmStart" style="flex:1">${t("startComp")}</button><button class="btn ghost" id="rmDel">${t("deleteRoom")}</button></div>`;
+    }else{
+      h+=`<div class="setup center"><p>${t("hostLabel",{n:esc(r.hostNick)})}</p><p class="msg big">${ms==="requested"?t("waitApprove"):t("waitHost")}</p></div>
+        <div class="setup"><h3>${t("players")}</h3><div id="rmMembers"></div></div>
+        <button class="btn ghost" id="rmLeave">${t("leave")}</button>`;
+    }
+  }else if(r.status==="live"){
+    const player=ms==="joined";
+    h+=`<div class="progress"><span>${t("qOf",{i:r.qi+1,n:r.qs.length})}</span><span id="rmCount"></span></div>`;
+    if(r.phase==="question")h+=`<div class="timer" id="rmBar"><i style="width:100%"></i></div><div class="secs" id="rmSecs"></div>`;
+    h+=`<div class="qcard"><h3 dir="auto">${esc(q.q)}</h3><div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-o="${i}" dir="auto" ${player&&r.phase==="question"?"":"disabled"}>${esc(o)}</button>`).join("")}</div>
+      <div class="fb" id="rmFb" aria-live="polite"></div></div>`;
+    if(host){
+      h+=`<div class="setup"><h3>${t("modPanel")}</h3><div id="rmMembers"></div><div class="row" style="margin-top:12px">`+
+        (r.phase==="question"?`<button class="btn primary" id="rmReveal">${t("showAns")}</button><button class="btn" id="rmSkip">${t("skipQ")}</button>`
+          :`<button class="btn primary" id="rmNext">${r.qi+1<r.qs.length?t("nextQ"):t("seeResult")}</button>`)+
+        `<button class="btn ghost" id="rmEnd">${t("endComp")}</button></div></div>`;
+    }
+    if(r.phase==="reveal")h+=`<div class="setup"><h3>${t("leaderboard")}</h3><div class="lb" id="rmBoard"></div>${host?"":`<p class="msg">${t("waitNext")}</p>`}</div>`;
+    if(!host)h+=`<button class="btn ghost" id="rmLeave">${t("leave")}</button>`;
+  }else{
+    h+=`<div class="setup center"><div class="score">🏆</div><p class="msg big">${t("finalTitle")}</p></div>
+      <div class="setup"><h3>${t("leaderboard")}</h3><div class="lb" id="rmBoard"></div></div>`;
+    if(host)h+=`<div class="row"><button class="btn primary" id="rmAgain">${t("playAgainRoom")}</button><button class="btn ghost" id="rmDel">${t("deleteRoom")}</button></div>`;
+  }
+  st.innerHTML=h;
+  bindRoom(host);
+}
+function bindRoom(host){
+  const on=(id,fn)=>{const el=$("#"+id);if(el)el.onclick=fn};
+  on("rmBack",groupHome);
+  on("rmCopy",async()=>{try{await navigator.clipboard.writeText(room.code);toast(t("copied"))}catch(e){toast(room.code)}});
+  on("rmLock",()=>act(()=>roomRef().update({locked:!room.locked})));
+  on("rmDel",()=>{if(confirm(t("confirmDelRoom")))act(async()=>{const id=roomId;groupHome();await fb.fs.collection("rooms").doc(id).delete()})});
+  on("rmStart",()=>{if(!joinedPlayers().length){toast(t("needPlayers"));return}act(()=>roomRef().update({status:"live",phase:"question",qi:0,round:(room.round||0)+1,qAt:FV().serverTimestamp()}))});
+  on("rmLeave",()=>{if(confirm(t("confirmLeave")))act(async()=>{await roomRef().update({["members."+meUid()+".status"]:"left"});groupHome()})});
+  on("rmReveal",hostReveal);
+  on("rmSkip",hostNext);on("rmNext",hostNext);
+  on("rmEnd",()=>{if(confirm(t("confirmEnd")))act(()=>roomRef().update({status:"ended"}))});
+  on("rmAgain",()=>act(()=>{
+    const upd={status:"lobby",qi:0,phase:"question",qAt:null,qs:shuffle(room.qs).map(q=>{const a=q.opts[q.ans],opts=shuffle(q.opts);return{q:q.q,opts,ans:opts.indexOf(a)}})};
+    joinedPlayers().forEach(m=>{upd["members."+m.uid+".score"]=0;upd["members."+m.uid+".last"]=0});
+    return roomRef().update(upd);
+  }));
+  $$("#groupStage .opt[data-o]").forEach(b=>b.onclick=()=>submitAnswer(+b.dataset.o));
+  const sr=$("#rmSearch");if(sr)sr.addEventListener("input",()=>{clearTimeout(searchT);searchT=setTimeout(searchUsers,300)});
+}
+function renderRoomDynamic(){
+  if(!room||current!=="group")return;
+  const uid=meUid(),host=room.hostUid===uid,r=room,q=r.qs[r.qi]||{opts:[],ans:0};
+  const mem=$("#rmMembers");
+  if(mem){
+    const entries=Object.entries(r.members||{}).map(([u,m])=>({uid:u,...m}));
+    if(r.status==="lobby"){
+      const shown=host?entries.filter(m=>m.status!=="declined"||true):entries.filter(m=>m.status==="joined");
+      const order={requested:0,joined:1,invited:2};
+      mem.innerHTML=shown.length?shown.sort((a,b)=>(order[a.status]??3)-(order[b.status]??3)).map(m=>`<div class="mrow"><span class="nm" dir="auto">${esc(m.nick)} ${m.uid===uid?t("youTag"):""}</span>
+        <span class="pill ${m.status==="joined"?"ok":m.status==="requested"?"warn":""}">${t(mStatusLabel[m.status]||"sInvited")}</span>
+        ${host&&m.uid!==uid?(m.status==="requested"?`<button class="btn ok" data-ap="${m.uid}">${t("approve")}</button><button class="btn ghost" data-rj="${m.uid}">${t("reject")}</button>`
+          :["joined","invited"].includes(m.status)?`<button class="btn ghost" data-rm="${m.uid}">${t("remove")}</button>`:""):""}</div>`).join("")
+        :`<p class="msg">${t("noPlayersYet")}</p>`;
+    }else{
+      // live: moderator sees who answered + scores, can remove
+      mem.innerHTML=joinedPlayers().sort((a,b)=>(b.score||0)-(a.score||0)).map(m=>{const a=answers[m.uid];
+        return `<div class="mrow"><span class="nm" dir="auto">${esc(m.nick)}</span>${r.phase==="question"?(a?`<span class="pill ok">✓</span>`:`<span class="pill">…</span>`):(m.last?`<span class="gain">+${m.last}</span>`:"")}<span class="sc">${m.score||0}</span>${m.uid!==uid?`<button class="btn ghost" data-rm="${m.uid}">${t("remove")}</button>`:""}</div>`}).join("")||`<p class="msg">${t("noPlayersYet")}</p>`;
+    }
+    mem.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>act(()=>roomRef().update({["members."+b.dataset.ap+".status"]:"joined"})));
+    mem.querySelectorAll("[data-rj]").forEach(b=>b.onclick=()=>act(()=>roomRef().update({["members."+b.dataset.rj+".status"]:"rejected"})));
+    mem.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const m=r.members[b.dataset.rm];if(confirm(t("remove")+": "+(m?m.nick:"")+"?"))act(()=>roomRef().update({["members."+b.dataset.rm+".status"]:"removed"}))});
+  }
+  const lk=$("#rmLock");if(lk)lk.textContent=r.locked?t("unlock"):t("lock");
+  const stb=$("#rmStart");if(stb)stb.disabled=!joinedPlayers().length;
+  const cnt=$("#rmCount");if(cnt&&r.status==="live")cnt.textContent=t("answered",{a:Object.keys(answers).filter(u=>r.members[u]&&r.members[u].status==="joined").length,n:joinedPlayers().length});
+  if(r.status==="live"){
+    const mine=answers[uid],opts=$$("#groupStage .opt[data-o]");
+    opts.forEach(b=>{const i=+b.dataset.o;b.classList.toggle("sel",!!mine&&mine.choice===i&&r.phase==="question");
+      if(r.phase==="reveal"||host){b.classList.toggle("right",i===q.ans);b.classList.toggle("wrong",r.phase==="reveal"&&!!mine&&mine.choice===i&&i!==q.ans)}
+      if(mine)b.disabled=true;});
+    const fbx=$("#rmFb");
+    if(fbx){
+      const me=r.members[uid];
+      if(host&&r.phase==="question")fbx.textContent="";
+      else if(r.phase==="question"&&mine){fbx.className="fb";fbx.textContent=t("lockedIn")}
+      else if(r.phase==="reveal"&&me&&me.status==="joined"){const ok=mine&&mine.choice===q.ans;fbx.className="fb "+(ok?"ok":"bad");fbx.textContent=ok?t("youGot",{n:me.last||0}):(mine?t("youMissed"):t("noAnswer"))}
+      else fbx.textContent="";
+    }
+  }
+  const bd=$("#rmBoard");if(bd)bd.innerHTML=lbBoard(joinedPlayers(),r.status==="live");
+}
+function tickRoom(){
+  if(!room||room.status!=="live"||room.phase!=="question")return;
+  const start=tsMs(room.qAt)||Date.now(),left=Math.max(0,room.secs*1000-(Date.now()-start));
+  const bar=$("#rmBar");if(bar&&current==="group"){bar.querySelector("i").style.width=(left/(room.secs*1000)*100)+"%";bar.classList.toggle("low",left<=5000);$("#rmSecs").textContent=Math.ceil(left/1000)}
+  if(left<=0&&room.members[meUid()]&&!answers[meUid()])$$("#groupStage .opt[data-o]").forEach(b=>b.disabled=true);
+  if(room.hostUid===meUid()){
+    const pl=joinedPlayers(),done=pl.filter(m=>answers[m.uid]).length;
+    if(left<=0||(pl.length&&done>=pl.length))hostReveal();
+  }
+}
+async function searchUsers(){
+  const box=$("#rmResults"),inp=$("#rmSearch");if(!box||!inp||!room)return;
+  const term=inp.value.trim().toLowerCase();if(!term){box.innerHTML="";return}
+  try{
+    const snap=await fb.fs.collection("directory").orderBy("nickLower").startAt(term).endAt(term+"\uf8ff").limit(8).get();
+    const uid=meUid(),rows=[];
+    snap.forEach(d=>{if(d.id!==uid)rows.push({uid:d.id,...d.data()})});
+    box.innerHTML=rows.length?rows.map(u=>{const m=room.members&&room.members[u.uid];const active=m&&["invited","joined","requested"].includes(m.status);
+      return `<div class="mrow"><span class="nm" dir="auto">${esc(u.nick)}</span>${active?`<span class="pill">${t(mStatusLabel[m.status])}</span>`:`<button class="btn primary" data-inv="${u.uid}" data-nick="${esc(u.nick)}">${t("invite")}</button>`}</div>`}).join("")
+      :`<p class="msg">${t("noUsers")}</p>`;
+    box.querySelectorAll("[data-inv]").forEach(b=>b.onclick=()=>act(async()=>{
+      await roomRef().update({["members."+b.dataset.inv]:{nick:b.dataset.nick,status:"invited",score:0,last:0},memberIds:FV().arrayUnion(b.dataset.inv)});
+      b.outerHTML=`<span class="pill">${t("sInvited")}</span>`;
+    }));
+  }catch(e){console.error(e);box.innerHTML=`<p class="msg">${t("actionFail")}</p>`}
+}
+async function submitAnswer(i){
+  const uid=meUid();if(!room||answers[uid]||room.phase!=="question")return;
+  answers[uid]={uid,choice:i};renderRoomDynamic();
+  try{await roomRef().collection("answers").doc(`${room.round}_${room.qi}_${uid}`).set({uid,round:room.round,qi:room.qi,choice:i,at:FV().serverTimestamp()})}
+  catch(e){console.error(e);delete answers[uid];renderRoomDynamic();toast(t("actionFail"))}
+}
+async function hostReveal(){
+  const k=room.round+"_"+room.qi;if(revealKey===k||room.phase!=="question")return;revealKey=k;
+  await act(async()=>{
+    const snap=await roomRef().collection("answers").where("round","==",room.round).where("qi","==",room.qi).get();
+    const q=room.qs[room.qi],start=tsMs(room.qAt),upd={phase:"reveal"};
+    joinedPlayers().forEach(m=>upd["members."+m.uid+".last"]=0);
+    snap.forEach(d=>{const a=d.data();const m=room.members[a.uid];if(!m||m.status!=="joined"||a.choice!==q.ans)return;
+      const at=tsMs(a.at)||start,frac=Math.max(0,Math.min(1,1-(at-start)/(room.secs*1000)));
+      const pts=100+Math.round(50*frac);upd["members."+a.uid+".last"]=pts;upd["members."+a.uid+".score"]=FV().increment(pts)});
+    await roomRef().update(upd);
+  });
+}
+function hostNext(){
+  act(()=>room.qi+1<room.qs.length?roomRef().update({qi:room.qi+1,phase:"question",qAt:FV().serverTimestamp()}):roomRef().update({status:"ended"}));
 }
 
 /* ---------- menu ---------- */
