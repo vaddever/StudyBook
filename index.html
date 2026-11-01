@@ -177,11 +177,34 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
 .fab{position:fixed;inset-inline-end:max(16px,calc(50% - 364px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;border:0;background:var(--brand);color:var(--brand-ink);border-radius:16px;padding:12px 18px;font-weight:800;box-shadow:0 6px 18px rgba(20,30,70,.25)}
 .toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 18px;border-radius:12px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90%}
 .toast.on{opacity:1}
+.authing .wrap,.authing nav.tabs,.authing .fab{display:none!important}
+#authView:not([hidden]){min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 16px}
+.authcard{max-width:440px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px}
+.authcard .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.authcard .sub{margin-bottom:16px}
+.authcard .full{width:100%}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<section id="authView" hidden>
+  <div class="authcard">
+    <div class="top"><h1 class="title"><span data-t="appTitle"></span></h1><button class="iconbtn langbtn" id="langBtn3" type="button" aria-label="Switch language / ބަސް ބަދަލުކުރޭ"></button></div>
+    <p class="sub" data-t="authText"></p>
+    <div class="seg" id="authSeg">
+      <button type="button" data-a="in" aria-pressed="true" data-t="signIn"></button>
+      <button type="button" data-a="new" aria-pressed="false" data-t="newBook"></button>
+    </div>
+    <label class="f"><span data-t="nick"></span><input id="aNick" autocomplete="username" dir="auto" maxlength="20"></label>
+    <label class="f"><span data-t="pin"></span><input id="aPin" class="num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="current-password"></label>
+    <label class="f" id="aPin2Wrap" hidden><span data-t="pin2"></span><input id="aPin2" class="num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password"></label>
+    <p class="pstatus err" id="aErr" aria-live="polite"></p>
+    <button class="btn primary big full" id="aGo" type="button"></button>
+    <button class="btn ghost full" id="aLocal" type="button" style="margin-top:8px" data-t="localOnly"></button>
+  </div>
+</section>
+
 <div class="wrap">
   <header>
     <div>
@@ -279,6 +302,7 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
   <div class="dlg">
     <h2 data-t="moreOptions"></h2>
     <div class="menu">
+      <button class="btn" id="acctBtn" hidden></button>
       <button class="btn" id="langBtn2" data-t="switchLang"></button>
       <button class="btn" id="exportBtn" data-t="export"></button>
       <button class="btn" id="importBtn" data-t="import"></button>
@@ -294,6 +318,29 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
 <div class="toast" id="toast" role="status"></div>
 
 <script>
+/* =====================================================================
+   FIREBASE SETUP — paste your Firebase web config between the braces.
+   Leave it as null to run without accounts (questions stay on each device).
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA3A41-tdg0nSwmPFP3mIFdv0HWuQhSfvE",
+  authDomain: "study-book-6d850.firebaseapp.com",
+  projectId: "study-book-6d850",
+  storageBucket: "study-book-6d850.firebasestorage.app",
+  messagingSenderId: "981796835620",
+  appId: "1:981796835620:web:61e6de4344d51d1c19e3b1"
+};
+/* Example:
+const FIREBASE_CONFIG = {
+  apiKey: "AIza...",
+  authDomain: "study-book-xxxx.firebaseapp.com",
+  projectId: "study-book-xxxx",
+  storageBucket: "study-book-xxxx.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123"
+};
+*/
+
 (function(){
 "use strict";
 /* ---------- translations ---------- */
@@ -309,6 +356,10 @@ const I18N={
   reading:"{f} ކިޔަނީ…",fileFound:"{n} ސުވާލު ފެނިއްޖެ ({f} ފައިލް). ބަލާލުމަށްފަހު ރައްކާކުރޭ.",fileNone:"ފައިލް ކިޔައިފި، ނަމަވެސް ސ:/ޖ: ނުވަތަ Q:/A: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު. Claude ލައްވާ ހޯދައިލާ.",imgAdded:"ފޮޓޯ ލިބިއްޖެ. \"✨ ފޮޓޯ / ސަފުހާތައް ކިޔާ\" އަށް ފިތާލާ.",
   pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔައިލާ.",unsupported:"{f} ކިޔޭކަށް ނެތް. މި ބާވަތުގެ ފައިލް ނުކިޔޭ.",readFail:"{f} ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",pasteFail:"ޕޭސްޓް ނުކުރެވުނު. Ctrl+V ބޭނުންކޮށްލާ.",
   aiFind:"✨ Claude ލައްވާ ސުވާލު ހޯދާ",aiScan:"✨ ފޮޓޯ / ސަފުހާތައް ކިޔާ",aiWorking:"Claude ސުވާލު ހޯދަނީ… ({i}/{n})",aiDone:"Claude އަށް {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",aiFail:"Claude އަށް ނުކިޔުނު. އަނެއްކާ މަސައްކަތްކޮށްލާ.",aiDenied:"Claude ބޭނުންކުރުމުގެ ހުއްދަ ނުލިބުނު.",aiNothing:"Claude އަށްވެސް ސުވާލެއް ނުފެނުނު.",passPrompt:"Claude ބޭނުންކުރަން ޕާސްކޯޑް ލިޔުއްވާ",addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ ފައިލެއް ހޮވާ",
+  authText:"ނިކްނޭމަކާއި PIN އެއް ބޭނުންކޮށް ތިބާގެ އަމިއްލަ ދަސްކުރާ ފޮތެއް ހަދާ. އެ ފޮތަށް ކޮންމެ ޑިވައިސްއަކުން ވަދެވޭނެ.",signIn:"ވަދޭ",newBook:"އާ ފޮތެއް ހަދާ",nick:"ނިކްނޭމް",pin:"PIN (4 އިން 6 އަށް ނަންބަރު)",pin2:"PIN އަލުން ލިޔޭ",create:"ފޮތް ހަދާ",
+  localOnly:"އެކައުންޓެއް ނެތި، މި ޑިވައިސްގައި ހަމައެކަނި ބޭނުންކުރޭ",errNick:"ނިކްނޭމް ވާންވާނީ 3 އަކުރާއި 20 އަކުރާ ދެމެދު",errPin:"PIN ގައި ހުންނަން ޖެހޭނީ 4 އިން 6 އަށް ނަންބަރު",errPin2:"ދެ PIN އެއްގޮތެއް ނޫން",
+  errTaken:"މި ނިކްނޭމް ކުރިން ބޭނުންކޮށްފި. އެހެން ނަމެއް ހޮވާ",errLogin:"ނިކްނޭމް ނުވަތަ PIN ރަނގަޅެއް ނޫން",errMany:"ގިނަ ފަހަރު މަސައްކަތްކުރީ. ކުޑަ ހިނދުކޮޅަކަށްފަހު އަލުން މަސައްކަތްކުރޭ",errNet:"އިންޓަނެޓް ކަނެކްޝަން ބަލާލާ",errSetup:"Firebase ގައި Email/Password ސައިން އިން ހުޅުވާފައެއް ނުވޭ (އެޑްމިން)",
+  signOut:"ފޮތުން ނިކުމޭ ({n})",signInMenu:"ފޮތަކަށް ވަދޭ / އާ ފޮތެއް ހަދާ",copyLocal:"މި ޑިވައިސްގައި ހުރި {n} ސުވާލު ތިބާގެ އާ ފޮތަށް ކޮޕީކުރަންތޯ؟",noteAccount:"ސުވާލުތައް ރައްކާވަނީ {n} ގެ ފޮތުގައި (ކްލައުޑް). ނިކްނޭމާއި PIN ބޭނުންކޮށް ކޮންމެ ޑިވައިސްއަކުން ވަދެވޭނެ.",
   save:"ރައްކާކުރޭ",cancel:"ކެންސަލް",close:"ބަންދުކުރޭ",moreOptions:"އިތުރު އޮޕްޝަންތައް",switchLang:"English ބަހަށް ބަދަލުކުރޭ",
   export:"ބެކަޕް ފައިލް ޑައުންލޯޑްކުރޭ",import:"ބެކަޕް ފައިލުން ސުވާލު ނަގާ",resetProg:"ދަސްކުރި މިންވަރު ފުރަތަމައިން ފަށާ",theme:"ކުލަ (ދުވާލު / ރޭގަނޑު)",
   noteLocal:"ސުވާލުތައް ރައްކާވަނީ މި ޑިވައިސްގައި. ބެކަޕް ފައިލުން އެހެން ޑިވައިސްއަކަށް ގެންދެވޭނެ.",noteCloud:"ސުވާލުތައް ރައްކާވަނީ ކްލައުޑްގައި. ސައިން އިން ކޮށްގެން ކޮންމެ ޑިވައިސްއަކުން ބެލޭނެ.",
@@ -341,6 +392,10 @@ const I18N={
   reading:"Reading {f}…",fileFound:"Found {n} questions in {f} file(s). Check them, then save.",fileNone:"Files read, but no questions in Q:/A: format. Try finding them with Claude.",imgAdded:"Image added. Tap \"✨ Read images / pages\".",
   pdfNoText:"This PDF has no text (it looks scanned). Try reading the pages as images.",unsupported:"Can't read {f} — this file type isn't supported.",readFail:"Couldn't read {f}. Check the file.",pasteFail:"Couldn't paste. Try Ctrl+V.",
   aiFind:"✨ Find Q&A with Claude",aiScan:"✨ Read images / pages",aiWorking:"Claude is finding questions… ({i}/{n})",aiDone:"Claude found {n} questions. Check them, then save.",aiFail:"Claude couldn't read it. Try again.",aiDenied:"Permission to use Claude wasn't given.",aiNothing:"Claude didn't find any questions either.",passPrompt:"Enter the passcode to use Claude",addSelected:"Add {n} selected questions",pickPdf:"Choose a file first",
+  authText:"Create your own study book with a nickname and a PIN, then open it on any device.",signIn:"Sign in",newBook:"New study book",nick:"Nickname",pin:"PIN (4–6 digits)",pin2:"Repeat PIN",create:"Create book",
+  localOnly:"Use without an account (this device only)",errNick:"Nickname must be 3–20 characters",errPin:"PIN must be 4–6 digits",errPin2:"The two PINs don't match",
+  errTaken:"That nickname is already taken. Choose another.",errLogin:"Nickname or PIN is incorrect",errMany:"Too many tries. Wait a little and try again.",errNet:"Check your internet connection",errSetup:"Email/Password sign-in isn't enabled in Firebase (admin)",
+  signOut:"Sign out ({n})",signInMenu:"Sign in / create a study book",copyLocal:"Copy the {n} questions on this device into your new study book?",noteAccount:"Questions are saved in {n}'s study book in the cloud. Sign in with the nickname and PIN on any device.",
   save:"Save",cancel:"Cancel",close:"Close",moreOptions:"More options",switchLang:"ދިވެހި ބަހަށް ބަދަލުކުރޭ",
   export:"Download backup file",import:"Restore from backup file",resetProg:"Reset learning progress",theme:"Colors (light / dark)",
   noteLocal:"Questions are saved on this device. Use a backup file to move them to another device.",noteCloud:"Questions are saved to the cloud. Sign in on any device to see them.",
@@ -391,14 +446,14 @@ function applyLang(){
   $$("[data-tp]").forEach(el=>el.placeholder=t(el.dataset.tp));
   $$("[data-ta]").forEach(el=>el.setAttribute("aria-label",t(el.dataset.ta)));
   $("#fBulk").placeholder=t("bulkPh");
-  $("#langBtn").textContent=lang==="dv"?"EN":"ދިވެހި";
+  $("#langBtn").textContent=$("#langBtn3").textContent=lang==="dv"?"EN":"ދިވެހި";
   $("#modeNote").textContent=mode==="db"?t("cloudTag"):t("tagline");
   $("#storeNote").textContent=mode==="db"?t("noteCloud"):t("noteLocal");
   $("#toggleAll").textContent=showAll?t("hideAll"):t("showAll");
-  renderAllStatic();go(current,true);
+  renderAllStatic();go(current,true);setAuthMode(authMode);updateAccountUI();
 }
 function switchLang(){lang=lang==="dv"?"en":"dv";try{localStorage.setItem("dv-study-lang",lang)}catch(e){}applyLang()}
-$("#langBtn").onclick=switchLang;
+$("#langBtn").onclick=switchLang;$("#langBtn3").onclick=switchLang;
 $("#langBtn2").onclick=()=>{$("#menuDlg").close();switchLang()};
 
 /* ---------- storage ---------- */
@@ -931,6 +986,105 @@ function groupQ(){
   },1000);
 }
 
+/* ---------- Firebase accounts (nickname + PIN) ---------- */
+const FB="https://www.gstatic.com/firebasejs/10.12.2/";
+let fb=null,fbUser=null,fbUnsub=null,fbNick="",pendingNick="",pendingCopy=null,authMode="in";
+const fbOn=()=>!!FIREBASE_CONFIG&&!(window.claude&&window.claude.use);
+function setAuthMode(m){
+  authMode=m;$$("#authSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.a===m));
+  $("#aPin2Wrap").hidden=m!=="new";$("#aGo").textContent=m==="new"?t("create"):t("signIn");
+  $("#aPin").autocomplete=m==="new"?"new-password":"current-password";$("#aErr").textContent="";
+}
+$$("#authSeg button").forEach(b=>b.onclick=()=>setAuthMode(b.dataset.a));
+function showAuth(on){$("#authView").hidden=!on;document.body.classList.toggle("authing",on);if(on)setTimeout(()=>$("#aNick").focus(),50)}
+function updateAccountUI(){
+  const btn=$("#acctBtn");btn.hidden=!fbOn();
+  if(!fbOn())return;
+  btn.textContent=fbUser?t("signOut",{n:fbNick}):t("signInMenu");
+  $("#modeNote").textContent=fbUser?"👤 "+fbNick:t("tagline");
+  $("#storeNote").textContent=fbUser?t("noteAccount",{n:fbNick}):t("noteLocal");
+}
+async function nickEmail(nick){
+  const n=nick.trim().toLowerCase().normalize("NFC").replace(/\s+/g," ");
+  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(n));
+  return "u"+[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("").slice(0,40)+"@studybook.app";
+}
+const pinPw=pin=>"sbk-"+pin+"-pin";
+function authErr(e){
+  const c=(e&&e.code)||"";
+  if(c.includes("email-already-in-use"))return t("errTaken");
+  if(c.includes("too-many-requests"))return t("errMany");
+  if(c.includes("network-request-failed"))return t("errNet");
+  if(c.includes("operation-not-allowed"))return t("errSetup");
+  return t("errLogin");
+}
+$("#aGo").onclick=async()=>{
+  const nick=$("#aNick").value.trim().replace(/\s+/g," "),pin=$("#aPin").value.trim(),err=$("#aErr");
+  if(nick.length<3||nick.length>20){err.textContent=t("errNick");return}
+  if(!/^\d{4,6}$/.test(pin)){err.textContent=t("errPin");return}
+  if(authMode==="new"&&pin!==$("#aPin2").value.trim()){err.textContent=t("errPin2");return}
+  if(!fb){err.textContent=t("errNet");return}
+  const go=$("#aGo");go.disabled=true;err.textContent="";
+  try{
+    const email=await nickEmail(nick);
+    if(authMode==="new"){
+      let local=[];try{const r=localStorage.getItem(LS_KEY);local=r?JSON.parse(r):[]}catch(e){}
+      pendingCopy=local.length&&confirm(t("copyLocal",{n:local.length}))?local:null;
+      pendingNick=nick;
+      const cred=await fb.auth.createUserWithEmailAndPassword(email,pinPw(pin));
+      await fb.fs.collection("users").doc(cred.user.uid).set({nick,created:Date.now()});
+      fbNick=nick;updateAccountUI();
+    }else{
+      await fb.auth.signInWithEmailAndPassword(email,pinPw(pin));
+    }
+    $("#aPin").value="";$("#aPin2").value="";
+  }catch(e){console.error(e);err.textContent=authErr(e);pendingCopy=null}
+  finally{go.disabled=false}
+};
+$("#aPin").addEventListener("keydown",e=>{if(e.key==="Enter")$("#aGo").click()});
+$("#aPin2").addEventListener("keydown",e=>{if(e.key==="Enter")$("#aGo").click()});
+$("#aLocal").onclick=()=>{try{localStorage.setItem("dv-study-localonly","1")}catch(e){}showAuth(false)};
+$("#acctBtn").onclick=async()=>{
+  $("#menuDlg").close();
+  try{localStorage.removeItem("dv-study-localonly")}catch(e){}
+  if(fbUser&&fb){await fb.auth.signOut()}else{setAuthMode("in");showAuth(true)}
+};
+async function startFirebase(){
+  let localOnly=false;try{localOnly=localStorage.getItem("dv-study-localonly")==="1"}catch(e){}
+  loadLocal();renderAllStatic();
+  if(!localOnly)showAuth(true);
+  try{
+    await loadScript(FB+"firebase-app-compat.js");
+    await loadScript(FB+"firebase-auth-compat.js");
+    await loadScript(FB+"firebase-firestore-compat.js");
+  }catch(e){$("#aErr").textContent=t("errNet");return}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const fs=firebase.firestore();
+  try{await fs.enablePersistence({synchronizeTabs:true})}catch(e){}
+  fb={auth:firebase.auth(),fs};
+  fb.auth.onAuthStateChanged(async u=>{
+    if(fbUnsub){fbUnsub();fbUnsub=null}
+    fbUser=u;openIds.clear();
+    if(u){
+      showAuth(false);
+      try{localStorage.removeItem("dv-study-localonly")}catch(e){}
+      fbNick=pendingNick||"";
+      try{const d=await fs.collection("users").doc(u.uid).get();if(d.exists&&d.data().nick)fbNick=d.data().nick}catch(e){}
+      pendingNick="";
+      mode="db";dbRef=fs.collection("users").doc(u.uid).collection("cards");cards=[];renderAllStatic();updateAccountUI();
+      fbUnsub=dbRef.onSnapshot(snap=>{
+        cards=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.created||0)-(b.created||0));
+        renderAllStatic();if(current!=="list"&&!document.querySelector(".view.on .qcard, .view.on .flash, .view.on .mgrid"))go(current,true);
+      },e=>{console.error(e);toast(t("errNet"))});
+      if(pendingCopy){const list=pendingCopy;pendingCopy=null;for(const c of list){try{await dbRef.doc(c.id).set(clean(c))}catch(e){}}}
+    }else{
+      mode="local";dbRef=null;fbNick="";loadLocal();renderAllStatic();updateAccountUI();go("list",true);
+      let lo=false;try{lo=localStorage.getItem("dv-study-localonly")==="1"}catch(e){}
+      showAuth(!lo);
+    }
+  });
+}
+
 /* ---------- menu ---------- */
 $("#menuBtn").onclick=()=>$("#menuDlg").showModal();
 $("#menuClose").onclick=()=>$("#menuDlg").close();
@@ -964,7 +1118,8 @@ $("#importFile").onchange=e=>{
 };
 
 function renderAllStatic(){renderStats();renderList();if(current==="flash"&&!fDeck.length)flashStart()}
-loadLocal();applyLang();connectCloud();
+if(fbOn()){applyLang();startFirebase()}
+else{loadLocal();applyLang();connectCloud()}
 })();
 </script>
 </body>
