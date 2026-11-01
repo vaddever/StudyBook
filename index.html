@@ -159,7 +159,8 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
 .menu .btn{text-align:start}
 .note{font-size:.88rem;color:var(--muted);margin:10px 0 0}
 .filebtn{display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--line);border-radius:14px;padding:18px;background:var(--paper);font-weight:600;cursor:pointer;margin-bottom:12px}
-.filebtn:focus-within{outline:3px solid var(--brand)}
+.filebtn:focus-within,.filebtn.drag{outline:3px solid var(--brand)}
+.filebtn.drag{background:var(--chip)}
 .pstatus{font-size:.92rem;color:var(--muted);margin:0 0 10px;min-height:1.5em}
 .pstatus.err{color:var(--bad)}
 .ai-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -244,7 +245,7 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
     <div class="seg" id="addSeg">
       <button type="button" data-mode="one" aria-pressed="true" data-t="oneQ"></button>
       <button type="button" data-mode="bulk" aria-pressed="false" data-t="manyQ"></button>
-      <button type="button" data-mode="pdf" aria-pressed="false">PDF</button>
+      <button type="button" data-mode="pdf" aria-pressed="false" data-t="fileTab"></button>
     </div>
     <label class="f"><span data-t="subject"></span><input id="fSubj" list="subjList" data-tp="subjectPh" dir="auto"></label>
     <datalist id="subjList"></datalist>
@@ -257,8 +258,9 @@ dialog::backdrop{background:rgba(10,15,30,.5)}
       <label class="f"><span class="sr" data-t="manyQ"></span><textarea id="fBulk" rows="9" dir="auto"></textarea></label>
     </div>
     <div id="pdfBox" hidden>
-      <p class="hint" data-t="pdfHint"></p>
-      <label class="filebtn">📄 <span data-t="choosePdf"></span><input type="file" id="pdfFile" accept="application/pdf,.pdf" class="sr"></label>
+      <p class="hint" data-t="fileHint"></p>
+      <label class="filebtn" id="dropZone">📄 <span data-t="chooseFile"></span><input type="file" id="pdfFile" multiple accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.xls,.json,image/*,application/pdf" class="sr"></label>
+      <div class="row" style="margin-bottom:10px"><button type="button" class="btn" id="pasteBtn" data-t="pasteBtn"></button><span class="hint" style="margin:0" data-t="pasteHint"></span></div>
       <p class="pstatus" id="pdfStatus" aria-live="polite"></p>
       <div class="ai-row" id="aiRow" hidden>
         <button type="button" class="btn" id="aiText" data-t="aiFind"></button>
@@ -303,9 +305,10 @@ const I18N={
   oneQ:"އެއް ސުވާލު",manyQ:"ގިނަ ސުވާލު",subject:"މާއްދާ / ބައި",subjectPh:"މިސާލު: ސައިންސް",question:"ސުވާލު",answer:"ޖަވާބު",
   bulkHint:"ކޮންމެ ސުވާލެއް ފަށާނީ \"ސ:\" އިން، ޖަވާބު \"ޖ:\" އިން. ސުވާލުތަކުގެ މެދުގައި ހުސް ލައިނެއް ދޫކޮށްލާ. (Q: / A: ވެސް ބޭނުންކުރެވޭނެ)",
   bulkPh:"ސ: ދިވެހިރާއްޖޭގެ ވެރިރަށަކީ ކޮބާ؟\nޖ: މާލެ\n\nސ: 7 × 8 ކިތަކަށް؟\nޖ: 56",
-  pdfHint:"ސުވާލާއި ޖަވާބު ހުރި PDF ފައިލެއް ހޮވާ. ފެނުނު ސުވާލުތައް ރައްކާކުރުމުގެ ކުރިން ބަލައި ބަދަލުކުރެވޭނެ.",choosePdf:"PDF ފައިލް ހޮވާ",pdfLoading:"PDF ކިޔަނީ…",
-  pdfFound:"{p} ސަފުހާއިން {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",pdfNone:"{p} ސަފުހާ ކިޔައިފި، ނަމަވެސް ސ:/ޖ: ނުވަތަ Q:/A: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު. Claude ލައްވާ ހޯދައިލާ.",pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔައިލާ.",pdfFail:"PDF ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",
-  aiFind:"✨ Claude ލައްވާ ސުވާލު ހޯދާ",aiScan:"✨ ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔާ",aiWorking:"Claude ސުވާލު ހޯދަނީ… ({i}/{n})",aiDone:"Claude އަށް {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",aiFail:"Claude އަށް ނުކިޔުނު. އަނެއްކާ މަސައްކަތްކޮށްލާ.",aiDenied:"Claude ބޭނުންކުރުމުގެ ހުއްދަ ނުލިބުނު.",aiNothing:"Claude އަށްވެސް ސުވާލެއް ނުފެނުނު.",addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ PDF ފައިލެއް ހޮވާ",
+  fileTab:"ފައިލް",fileHint:"PDF، Word، Excel، ލިޔުން ނުވަތަ ފޮޓޯ ފައިލެއް ހޮވާ، ޑްރެގްކޮށް ބޭއްވާ، ނުވަތަ ކޮޕީކޮށް ޕޭސްޓްކުރޭ. ފެނުނު ސުވާލުތައް ރައްކާކުރުމުގެ ކުރިން ބަލައި ބަދަލުކުރެވޭނެ.",chooseFile:"ފައިލް ހޮވާ ނުވަތަ މިތަނަށް ޑްރެގްކުރޭ",pasteBtn:"📋 ޕޭސްޓްކުރޭ",pasteHint:"ނުވަތަ Ctrl+V އިން ކޮޕީކުރި ފައިލް، ފޮޓޯ ނުވަތަ ލިޔުން ޕޭސްޓްކުރޭ.",
+  reading:"{f} ކިޔަނީ…",fileFound:"{n} ސުވާލު ފެނިއްޖެ ({f} ފައިލް). ބަލާލުމަށްފަހު ރައްކާކުރޭ.",fileNone:"ފައިލް ކިޔައިފި، ނަމަވެސް ސ:/ޖ: ނުވަތަ Q:/A: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު. Claude ލައްވާ ހޯދައިލާ.",imgAdded:"ފޮޓޯ ލިބިއްޖެ. \"✨ ފޮޓޯ / ސަފުހާތައް ކިޔާ\" އަށް ފިތާލާ.",
+  pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). ސަފުހާތައް ފޮޓޯއެއްގެ ގޮތުގައި ކިޔައިލާ.",unsupported:"{f} ކިޔޭކަށް ނެތް. މި ބާވަތުގެ ފައިލް ނުކިޔޭ.",readFail:"{f} ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",pasteFail:"ޕޭސްޓް ނުކުރެވުނު. Ctrl+V ބޭނުންކޮށްލާ.",
+  aiFind:"✨ Claude ލައްވާ ސުވާލު ހޯދާ",aiScan:"✨ ފޮޓޯ / ސަފުހާތައް ކިޔާ",aiWorking:"Claude ސުވާލު ހޯދަނީ… ({i}/{n})",aiDone:"Claude އަށް {n} ސުވާލު ފެނިއްޖެ. ބަލާލުމަށްފަހު ރައްކާކުރޭ.",aiFail:"Claude އަށް ނުކިޔުނު. އަނެއްކާ މަސައްކަތްކޮށްލާ.",aiDenied:"Claude ބޭނުންކުރުމުގެ ހުއްދަ ނުލިބުނު.",aiNothing:"Claude އަށްވެސް ސުވާލެއް ނުފެނުނު.",passPrompt:"Claude ބޭނުންކުރަން ޕާސްކޯޑް ލިޔުއްވާ",addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ ފައިލެއް ހޮވާ",
   save:"ރައްކާކުރޭ",cancel:"ކެންސަލް",close:"ބަންދުކުރޭ",moreOptions:"އިތުރު އޮޕްޝަންތައް",switchLang:"English ބަހަށް ބަދަލުކުރޭ",
   export:"ބެކަޕް ފައިލް ޑައުންލޯޑްކުރޭ",import:"ބެކަޕް ފައިލުން ސުވާލު ނަގާ",resetProg:"ދަސްކުރި މިންވަރު ފުރަތަމައިން ފަށާ",theme:"ކުލަ (ދުވާލު / ރޭގަނޑު)",
   noteLocal:"ސުވާލުތައް ރައްކާވަނީ މި ޑިވައިސްގައި. ބެކަޕް ފައިލުން އެހެން ޑިވައިސްއަކަށް ގެންދެވޭނެ.",noteCloud:"ސުވާލުތައް ރައްކާވަނީ ކްލައުޑްގައި. ސައިން އިން ކޮށްގެން ކޮންމެ ޑިވައިސްއަކުން ބެލޭނެ.",
@@ -334,9 +337,10 @@ const I18N={
   oneQ:"One question",manyQ:"Many questions",subject:"Subject / topic",subjectPh:"e.g. Science",question:"Question",answer:"Answer",
   bulkHint:"Start each question with \"Q:\" and each answer with \"A:\". Leave a blank line between questions. (ސ: / ޖ: also work)",
   bulkPh:"Q: What is the capital of the Maldives?\nA: Malé\n\nQ: What is 7 × 8?\nA: 56",
-  pdfHint:"Choose a PDF with questions and answers. You can check and edit what's found before saving.",choosePdf:"Choose PDF file",pdfLoading:"Reading PDF…",
-  pdfFound:"Found {n} questions in {p} pages. Check them, then save.",pdfNone:"Read {p} pages but found no questions in Q:/A: format. Try finding them with Claude.",pdfNoText:"This PDF has no text (it looks scanned). Try reading the pages as images.",pdfFail:"Couldn't read this PDF. Check the file.",
-  aiFind:"✨ Find Q&A with Claude",aiScan:"✨ Read pages as images",aiWorking:"Claude is finding questions… ({i}/{n})",aiDone:"Claude found {n} questions. Check them, then save.",aiFail:"Claude couldn't read it. Try again.",aiDenied:"Permission to use Claude wasn't given.",aiNothing:"Claude didn't find any questions either.",addSelected:"Add {n} selected questions",pickPdf:"Choose a PDF file first",
+  fileTab:"File",fileHint:"Choose, drag in, or copy & paste a PDF, Word, Excel, text or image file. You can check and edit what's found before saving.",chooseFile:"Choose files or drag them here",pasteBtn:"📋 Paste",pasteHint:"Or press Ctrl+V to paste a copied file, image or text.",
+  reading:"Reading {f}…",fileFound:"Found {n} questions in {f} file(s). Check them, then save.",fileNone:"Files read, but no questions in Q:/A: format. Try finding them with Claude.",imgAdded:"Image added. Tap \"✨ Read images / pages\".",
+  pdfNoText:"This PDF has no text (it looks scanned). Try reading the pages as images.",unsupported:"Can't read {f} — this file type isn't supported.",readFail:"Couldn't read {f}. Check the file.",pasteFail:"Couldn't paste. Try Ctrl+V.",
+  aiFind:"✨ Find Q&A with Claude",aiScan:"✨ Read images / pages",aiWorking:"Claude is finding questions… ({i}/{n})",aiDone:"Claude found {n} questions. Check them, then save.",aiFail:"Claude couldn't read it. Try again.",aiDenied:"Permission to use Claude wasn't given.",aiNothing:"Claude didn't find any questions either.",passPrompt:"Enter the passcode to use Claude",addSelected:"Add {n} selected questions",pickPdf:"Choose a file first",
   save:"Save",cancel:"Cancel",close:"Close",moreOptions:"More options",switchLang:"ދިވެހި ބަހަށް ބަދަލުކުރޭ",
   export:"Download backup file",import:"Restore from backup file",resetProg:"Reset learning progress",theme:"Colors (light / dark)",
   noteLocal:"Questions are saved on this device. Use a backup file to move them to another device.",noteCloud:"Questions are saved to the cloud. Sign in on any device to see them.",
@@ -561,20 +565,50 @@ $("#saveBtn").onclick=async()=>{
 };
 $("#sampleBtn").onclick=()=>persistMany(t("sampleSet").map((r,i)=>({id:uid(),subj:r[0],q:r[1],a:r[2],known:0,seen:0,created:Date.now()+i})));
 
-/* ---------- PDF import ---------- */
-const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
-let pdfRows=[],pdfText="",pdfDoc=null,sampleCap=null,sampleTried=false;
-function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+/* ---------- File import (PDF, Word, Excel, text, images) ---------- */
+const CDN="https://cdnjs.cloudflare.com/ajax/libs/";
+const PDFJS=CDN+"pdf.js/3.11.174/";
+let pdfRows=[],srcText="",srcPdfs=[],srcImages=[],fileCount=0,sampleCap=null,sampleTried=false,hostedAI=null;
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]'))return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
 async function loadPdfJs(){
-  if(!window.pdfjsLib){await loadScript(PDFJS+"pdf.min.js")}
-  if(!window.pdfjsWorker){await loadScript(PDFJS+"pdf.worker.min.js")} // runs on the main thread (no cross-origin worker)
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";
-  return window.pdfjsLib;
+  if(!window.pdfjsLib)await loadScript(PDFJS+"pdf.min.js");
+  if(!window.pdfjsWorker)await loadScript(PDFJS+"pdf.worker.min.js");
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";return window.pdfjsLib;
 }
+const inClaude=()=>!!(window.claude&&window.claude.use);
 async function getSample(){
   if(sampleTried)return sampleCap;sampleTried=true;
-  try{sampleCap=window.claude&&window.claude.use?await claude.use("sample"):null}catch(e){sampleCap=null}
+  try{sampleCap=inClaude()?await claude.use("sample"):null}catch(e){sampleCap=null}
   return sampleCap;
+}
+/* AI availability: Claude artifact runtime, or the /api/claude function when hosted on Vercel */
+async function aiInfo(){
+  if(inClaude()){const s=await getSample();if(!s)return null;let lim=null;try{lim=await s.limits()}catch(e){}return{images:!!(lim&&lim.images)}}
+  if(hostedAI!==null)return hostedAI;
+  try{const r=await fetch("/api/claude");const j=await r.json();hostedAI=j&&j.ok?{images:true}:false}catch(e){hostedAI=false}
+  return hostedAI||null;
+}
+function blobToB64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(b)})}
+function parseJSONText(txt){const c=String(txt||"").replace(/```json|```/g,"").trim();const a=c.indexOf("["),b=c.lastIndexOf("]");return JSON.parse(a>=0&&b>a?c.slice(a,b+1):c)}
+async function aiJSON(prompt,img){
+  if(inClaude()){const s=await getSample();return s.json(prompt,img?{images:[img],modelTier:"default"}:{modelTier:"default"})}
+  const body={prompt};if(img)body.image={media_type:img.type||"image/jpeg",data:await blobToB64(img)};
+  for(let tries=0;tries<2;tries++){
+    let pass="";try{pass=localStorage.getItem("dv-study-pass")||""}catch(e){}
+    const r=await fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json","x-passcode":pass},body:JSON.stringify(body)});
+    if(r.status===401){const p=window.prompt(t("passPrompt"));if(!p)throw{code:"not_granted"};try{localStorage.setItem("dv-study-pass",p)}catch(e){}continue}
+    if(!r.ok)throw new Error("api "+r.status);
+    return parseJSONText((await r.json()).text);
+  }
+  throw{code:"not_granted"};
+}
+async function shrink(blob,max=1600){
+  try{
+    const bmp=await createImageBitmap(blob);const k=Math.min(1,max/Math.max(bmp.width,bmp.height));
+    const cv=document.createElement("canvas");cv.width=Math.round(bmp.width*k);cv.height=Math.round(bmp.height*k);
+    const ctx=cv.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(bmp,0,0,cv.width,cv.height);
+    return await new Promise(r=>cv.toBlob(r,"image/jpeg",.85));
+  }catch(e){return blob}
 }
 function pStatus(msg,err){const el=$("#pdfStatus");el.textContent=msg||"";el.classList.toggle("err",!!err)}
 function updateSaveLabel(){
@@ -582,7 +616,7 @@ function updateSaveLabel(){
   if(addMode==="pdf"){const n=pdfRows.filter(r=>r.on).length;b.textContent=t("addSelected",{n});b.disabled=!n}
   else{b.textContent=t("save");b.disabled=false}
 }
-function resetPdf(){pdfRows=[];pdfText="";pdfDoc=null;$("#pdfFile").value="";pStatus("");$("#aiRow").hidden=true;$("#pdfPreview").hidden=true;$("#pdfPreview").innerHTML="";updateSaveLabel()}
+function resetPdf(){pdfRows=[];srcText="";srcPdfs=[];srcImages=[];fileCount=0;$("#pdfFile").value="";pStatus("");$("#aiRow").hidden=true;$("#pdfPreview").hidden=true;$("#pdfPreview").innerHTML="";updateSaveLabel()}
 function renderPreview(){
   const box=$("#pdfPreview");box.hidden=!pdfRows.length;
   box.innerHTML=pdfRows.map((r,i)=>`<div class="prow${r.on?"":" off"}" data-i="${i}"><input type="checkbox" ${r.on?"checked":""} aria-label="${i+1}">
@@ -591,8 +625,7 @@ function renderPreview(){
 }
 $("#pdfPreview").addEventListener("input",e=>{
   const row=e.target.closest(".prow");if(!row)return;const r=pdfRows[+row.dataset.i];
-  if(e.target.type==="checkbox"){r.on=e.target.checked;row.classList.toggle("off",!r.on);updateSaveLabel()}
-  else r[e.target.dataset.k]=e.target.value;
+  if(e.target.type==="checkbox"){r.on=e.target.checked;row.classList.toggle("off",!r.on);updateSaveLabel()}else r[e.target.dataset.k]=e.target.value;
 });
 $("#pdfPreview").addEventListener("change",e=>{if(e.target.type==="checkbox"){const row=e.target.closest(".prow");pdfRows[+row.dataset.i].on=e.target.checked;row.classList.toggle("off",!e.target.checked);updateSaveLabel()}});
 
@@ -609,36 +642,96 @@ function parseLoose(text){
   const QR=/^(?:(?:Q|ސ)\s*\d*\s*[:：.)]|(?:ސުވާލު|Question|QUESTION|question)\s*\d*\s*[:：.\-)])\s*(.*)$/;
   const AR=/^(?:(?:A|ޖ)\s*[:：]|(?:ޖަވާބު|Ans|ANS|Answer|ANSWER|answer)\s*[:：.\-)])\s*(.*)$/;
   const NR=/^\(?\d{1,3}\s*[.)\-]\s+(.*)$/;
-  const hasA=lines.some(l=>AR.test(l));if(!hasA)return [];
+  if(!lines.some(l=>AR.test(l)))return [];
   const out=[];let q="",a="",cur=null;
   const push=()=>{if(q.trim()&&a.trim())out.push({q:q.trim(),a:a.trim(),on:true});q="";a="";cur=null};
-  lines.forEach(l=>{
-    let m;
+  lines.forEach(l=>{let m;
     if((m=l.match(AR))){cur="a";a+=(a?"\n":"")+m[1];return}
     if((m=l.match(QR))||((cur===null||cur==="a")&&(m=l.match(NR)))){push();cur="q";q=m[1];return}
     if(cur==="q")q+=" "+l;else if(cur==="a")a+="\n"+l;
   });
   push();return out;
 }
-$("#pdfFile").addEventListener("change",async e=>{
-  const f=e.target.files[0];if(!f)return;
-  pdfRows=[];renderPreview();$("#aiRow").hidden=true;pStatus(t("pdfLoading"));
-  try{
-    const lib=await loadPdfJs();
-    pdfDoc=await lib.getDocument({data:await f.arrayBuffer(),isEvalSupported:false}).promise;
-    const pages=[];for(let i=1;i<=pdfDoc.numPages;i++){pages.push((await pageLines(await pdfDoc.getPage(i))).join("\n"))}
-    pdfText=pages.join("\n\n");
-    pdfRows=parseLoose(pdfText);renderPreview();
-    const p=pdfDoc.numPages,noText=pdfText.replace(/\s/g,"").length<20;
-    pStatus(noText?t("pdfNoText"):pdfRows.length?t("pdfFound",{n:pdfRows.length,p}):t("pdfNone",{p}),!pdfRows.length);
-    const s=await getSample();
-    if(s){
-      $("#aiRow").hidden=false;$("#aiText").hidden=noText;
-      let lim=null;try{lim=await s.limits()}catch(err){}
-      $("#aiImg").hidden=!(lim&&lim.images);
-    }
-  }catch(err){console.error(err);pStatus(t("pdfFail"),true)}
+function addRows(rows){const seen=new Set(pdfRows.map(r=>r.q+"|"+r.a));rows.forEach(r=>{const k=r.q+"|"+r.a;if(!seen.has(k)){seen.add(k);pdfRows.push(r)}})}
+function rowsFromSheet(aoa){
+  const out=[];aoa.forEach((row,i)=>{const q=String(row[0]??"").trim(),a=String(row[1]??"").trim();
+    if(!q||!a)return;if(i===0&&/^(q|question|questions|ސުވާލު)$/i.test(q))return;out.push({q,a,on:true})});return out;
+}
+async function readOne(f){
+  const name=f.name||"",ext=(name.split(".").pop()||"").toLowerCase(),type=f.type||"";
+  pStatus(t("reading",{f:name||type}));
+  if(type==="application/pdf"||ext==="pdf"){
+    const lib=await loadPdfJs();const doc=await lib.getDocument({data:await f.arrayBuffer(),isEvalSupported:false}).promise;
+    const pages=[];for(let i=1;i<=doc.numPages;i++)pages.push((await pageLines(await doc.getPage(i))).join("\n"));
+    const txt=pages.join("\n\n");srcPdfs.push(doc);
+    if(txt.replace(/\s/g,"").length<20)return{note:"pdfNoText"};
+    srcText+="\n\n"+txt;addRows(parseLoose(txt));return{};
+  }
+  if(type.startsWith("image/")){srcImages.push(await shrink(f));return{note:"imgAdded"}}
+  if(ext==="docx"){
+    await loadScript(CDN+"mammoth/1.6.0/mammoth.browser.min.js");
+    const r=await window.mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()});
+    srcText+="\n\n"+r.value;addText(r.value);return{};
+  }
+  if(["xlsx","xls","csv"].includes(ext)){
+    await loadScript(CDN+"xlsx/0.18.5/xlsx.full.min.js");
+    const wb=window.XLSX.read(await f.arrayBuffer(),{type:"array"});
+    wb.SheetNames.forEach(n=>{const aoa=window.XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false});
+      addRows(rowsFromSheet(aoa));srcText+="\n\n"+aoa.map(r=>r.join(" | ")).join("\n")});
+    return{};
+  }
+  if(ext==="json"){const j=JSON.parse(await f.text());addRows((j.cards||j||[]).filter(c=>c&&c.q&&c.a).map(c=>({q:String(c.q),a:String(c.a),on:true})));return{}}
+  if(type.startsWith("text/")||["txt","md"].includes(ext)){const txt=await f.text();srcText+="\n\n"+txt;addText(txt);return{}}
+  return{note:"unsupported"};
+}
+function addText(txt){
+  let rows=parseLoose(txt);
+  if(!rows.length&&/(^|\n)\s*(ސ|Q)\s*[:：]/.test(txt))rows=parseBulk(txt,"").map(x=>({q:x.q,a:x.a,on:true}));
+  addRows(rows);
+}
+async function handleFiles(files,pastedText){
+  files=[...(files||[])].filter(Boolean);if(!files.length&&!pastedText)return;
+  let lastNote=null,err=false;
+  for(const f of files){
+    fileCount++;
+    try{const r=await readOne(f);if(r.note){lastNote=r.note==="unsupported"?t("unsupported",{f:f.name}):t(r.note);err=r.note!=="imgAdded"}}
+    catch(e){console.error(e);lastNote=t("readFail",{f:f.name||"file"});err=true}
+  }
+  if(pastedText){fileCount++;srcText+="\n\n"+pastedText;addText(pastedText)}
+  renderPreview();
+  pStatus(pdfRows.length?t("fileFound",{n:pdfRows.length,f:fileCount}):(lastNote||t("fileNone")),!pdfRows.length&&err);
+  const ai=await aiInfo();
+  if(ai){$("#aiRow").hidden=false;$("#aiText").hidden=!srcText.trim();$("#aiImg").hidden=!(ai.images&&(srcImages.length||srcPdfs.length))}
+}
+$("#pdfFile").addEventListener("change",e=>{handleFiles(e.target.files);e.target.value=""});
+const dz=$("#dropZone");
+["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("drag")}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,()=>dz.classList.remove("drag")));
+dz.addEventListener("drop",e=>{e.preventDefault();handleFiles(e.dataTransfer.files)});
+/* Ctrl+V anywhere while the File tab is open (files, screenshots or copied text) */
+document.addEventListener("paste",e=>{
+  if(!$("#addDlg").open)return;
+  const cd=e.clipboardData;if(!cd)return;
+  const files=[...cd.files];
+  if(addMode!=="pdf"){if(!files.length)return;setAddMode("pdf")}
+  if(e.target.closest&&e.target.closest(".prow"))return;
+  e.preventDefault();
+  handleFiles(files,files.length?"":cd.getData("text/plain"));
 });
+$("#pasteBtn").onclick=async()=>{
+  try{
+    const items=await navigator.clipboard.read();const files=[];let txt="";
+    for(const it of items){
+      const img=it.types.find(x=>x.startsWith("image/"));
+      if(img){const b=await it.getType(img);files.push(new File([b],"pasted."+img.split("/")[1],{type:img}));continue}
+      if(it.types.includes("text/plain"))txt+=await (await it.getType("text/plain")).text();
+    }
+    if(!files.length&&!txt)throw 0;handleFiles(files,txt);
+  }catch(e){
+    try{const txt=await navigator.clipboard.readText();if(txt){handleFiles([],txt);return}}catch(e2){}
+    toast(t("pasteFail"));
+  }
+};
 
 const AI_RULES='You turn study material into flashcards. The material may be in Dhivehi (Thaana script), English, or both. '+
  'If it already contains questions with answers, return every pair with its original wording and language. '+
@@ -646,33 +739,38 @@ const AI_RULES='You turn study material into flashcards. The material may be in 
  'Never add facts that are not in the material. Return ONLY a JSON array like [{"q":"question","a":"answer"}], or [] if nothing is usable.';
 function normAI(v){const arr=Array.isArray(v)?v:(v&&Array.isArray(v.items)?v.items:(v&&Array.isArray(v.cards)?v.cards:[]));
   return arr.filter(x=>x&&x.q&&x.a).map(x=>({q:String(x.q).trim(),a:String(x.a).trim(),on:true}))}
+async function pdfPageImages(limit){
+  const out=[];
+  for(const doc of srcPdfs){for(let i=1;i<=doc.numPages&&out.length<limit;i++){
+    const page=await doc.getPage(i);const vp=page.getViewport({scale:1.6});
+    const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;
+    await page.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
+    out.push(await new Promise(r=>cv.toBlob(r,"image/jpeg",.85)));
+  }}
+  return out;
+}
 async function runAI(useImages){
-  const s=await getSample();if(!s)return;
-  const btns=[$("#aiText"),$("#aiImg"),$("#saveBtn")];btns.forEach(b=>b.disabled=true);
+  if(!(await aiInfo()))return;
+  [$("#aiText"),$("#aiImg"),$("#saveBtn")].forEach(b=>b.disabled=true);
   const found=[];
   try{
     if(useImages){
-      const n=Math.min(pdfDoc.numPages,15);
-      for(let i=1;i<=n;i++){
-        pStatus(t("aiWorking",{i,n}));
-        const page=await pdfDoc.getPage(i);const vp=page.getViewport({scale:1.6});
-        const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;
-        await page.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
-        const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",.85));
-        found.push(...normAI(await s.json(AI_RULES+"\n\nThe material is the attached page image. Read the text carefully.",{images:[blob],modelTier:"default"})));
+      const imgs=srcImages.slice(0,15).concat(await pdfPageImages(Math.max(0,15-srcImages.length)));
+      for(let i=0;i<imgs.length;i++){
+        pStatus(t("aiWorking",{i:i+1,n:imgs.length}));
+        found.push(...normAI(await aiJSON(AI_RULES+"\n\nThe material is the attached image. Read the text carefully.",imgs[i])));
       }
     }else{
-      const chunks=[];for(let i=0;i<pdfText.length&&chunks.length<10;i+=9000)chunks.push(pdfText.slice(i,i+9000));
+      const chunks=[];for(let i=0;i<srcText.length&&chunks.length<10;i+=9000)chunks.push(srcText.slice(i,i+9000));
       for(let i=0;i<chunks.length;i++){
         pStatus(t("aiWorking",{i:i+1,n:chunks.length}));
-        found.push(...normAI(await s.json(AI_RULES+"\n\nMATERIAL (extracted from a PDF, line order may be imperfect):\n"+chunks[i],{modelTier:"default"})));
+        found.push(...normAI(await aiJSON(AI_RULES+"\n\nMATERIAL (extracted from files, line order may be imperfect):\n"+chunks[i])));
       }
     }
-    const seen=new Set();pdfRows=found.filter(r=>{const k=r.q+"|"+r.a;if(seen.has(k))return false;seen.add(k);return true});
-    renderPreview();pStatus(pdfRows.length?t("aiDone",{n:pdfRows.length}):t("aiNothing"),!pdfRows.length);
+    pdfRows=[];addRows(found);renderPreview();
+    pStatus(pdfRows.length?t("aiDone",{n:pdfRows.length}):t("aiNothing"),!pdfRows.length);
   }catch(err){
-    console.error(err);
-    if(found.length){pdfRows=found;renderPreview()}
+    console.error(err);if(found.length){pdfRows=[];addRows(found);renderPreview()}
     pStatus(err&&err.code==="not_granted"?t("aiDenied"):t("aiFail"),true);
   }finally{$("#aiText").disabled=false;$("#aiImg").disabled=false;updateSaveLabel()}
 }
