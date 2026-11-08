@@ -235,6 +235,18 @@ nav.tabs button[aria-current="page"] .ic{background:var(--chip);transform:none}
   .logo{width:44px;height:44px;border-radius:14px}
 }
 
+/* ===== shared books ===== */
+.viewbar{display:flex;align-items:center;gap:10px;background:var(--hi);color:var(--hi-ink);border-radius:16px;padding:10px 14px;margin:0 0 14px}
+.viewbar[hidden]{display:none}
+.vb-ic{font-size:1.4rem}
+.vb-t{flex:1;min-width:0;line-height:1.5}.vb-t b{display:block}.vb-t small{display:block;opacity:.75;font-size:.82rem}
+.viewbar .btn{background:var(--hi-ink);color:var(--hi);border:0;font-size:.9rem}
+body.readonly .fab,body.readonly .meta [data-edit],body.readonly .meta .del,body.readonly #sampleBtn,body.readonly #emptyList [data-open-add],body.readonly #exportBtn,body.readonly #importBtn{display:none!important}
+.linkrow{display:flex;gap:8px;margin:8px 0 6px}
+.linkrow input{flex:1;min-width:0;direction:ltr;font-size:.85rem;font-family:ui-monospace,Menlo,Consolas,monospace}
+.dlg h3{margin:16px 0 8px;font-size:1.02rem}
+.switch{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{width:20px;height:20px;flex:none}
 /* ===== group competitions ===== */
 .full{width:100%}
 .badge[hidden]{display:none}
@@ -295,11 +307,13 @@ nav.tabs .ic{position:relative}
       </div>
     </div>
     <div class="hdr-actions">
+      <button class="iconbtn" id="booksBtn" data-ta="books" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4v16H4zM10 4h4v16h-4z"/><path d="m16 5 3.8-1 2.2 15-3.8 1z"/></svg></button>
       <button class="iconbtn langbtn" id="langBtn" aria-label="Switch language / ބަސް ބަދަލުކުރޭ"></button>
       <button class="iconbtn" id="menuBtn" data-ta="moreOptions">⋯</button>
     </div>
   </header>
 
+  <div class="viewbar" id="viewBar" hidden><span class="vb-ic" aria-hidden="true">📖</span><div class="vb-t"><b id="viewName" dir="auto"></b><small data-t="viewOnlyHint"></small></div><button class="btn" id="viewBack"></button></div>
   <div class="summary">
   <div class="stats" aria-live="polite">
     <span><span data-t="stTotal"></span> <b id="stTotal" class="num">0</b></span>
@@ -384,6 +398,7 @@ nav.tabs .ic{position:relative}
     <h2 data-t="moreOptions"></h2>
     <div class="menu">
       <button class="btn" id="acctBtn" hidden></button>
+      <button class="btn" id="menuShare" hidden data-t="shareBook"></button>
       <button class="btn" id="langBtn2" data-t="switchLang"></button>
       <button class="btn" id="exportBtn" data-t="export"></button>
       <button class="btn" id="importBtn" data-t="import"></button>
@@ -393,6 +408,33 @@ nav.tabs .ic{position:relative}
     </div>
     <p class="note" id="storeNote"></p>
     <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+</dialog>
+
+<dialog id="booksDlg">
+  <div class="dlg">
+    <h2 data-t="books"></h2>
+    <div class="stack" id="booksList"></div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" id="booksClose" data-t="close"></button></div>
+  </div>
+</dialog>
+
+<dialog id="shareDlg">
+  <div class="dlg">
+    <h2 data-t="shareBook"></h2>
+    <p class="hint" style="margin:0 0 6px" data-t="shareHint2"></p>
+    <h3 data-t="shareLinkTitle"></h3>
+    <label class="switch"><input type="checkbox" id="shLinkOn"><span data-t="linkOnLabel"></span></label>
+    <div id="shLinkBox" hidden>
+      <div class="linkrow"><input class="search plain" id="shLink" readonly><button class="btn" id="shCopy" data-t="copyLink"></button></div>
+      <button class="btn primary" id="shNative" data-t="shareVia"></button>
+    </div>
+    <p class="hint" style="margin:8px 0 0" data-t="linkOffNote"></p>
+    <h3 data-t="shareStudents"></h3>
+    <input class="search full" id="shSearch" dir="auto" data-tp="invitePh">
+    <div id="shResults" style="margin-top:6px"></div>
+    <div id="shList"></div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" id="shareClose" data-t="close"></button></div>
   </div>
 </dialog>
 
@@ -437,6 +479,11 @@ const I18N={
   reading:"{f} ކިޔަނީ…",fileFound:"{n} ސުވާލު ފެނިއްޖެ ({f} ފައިލް). ބަލާލުމަށްފަހު ރައްކާކުރޭ.",fileNone:"ފައިލް ކިޔައިފި، ނަމަވެސް ސ:/ޖ:، Q:/A: ނުވަތަ ނަންބަރު ޖެހި ސުވާލު + ޖަވާބު: ފޯމެޓުގައި ސުވާލެއް ނުފެނުނު.",
   pdfNoText:"މި PDF ގައި ލިޔުމެއް ނެތް (ސްކޭންކޮށްފައިވާ ފައިލެކޭ ހީވޭ). މީގެން ސުވާލު ނުކިޔޭނެ.",unsupported:"{f} ކިޔޭކަށް ނެތް. މި ބާވަތުގެ ފައިލް ނުކިޔޭ.",readFail:"{f} ކިޔޭކަށް ނެތް. ފައިލް ބަލާލާ.",pasteFail:"ޕޭސްޓް ނުކުރެވުނު. Ctrl+V ބޭނުންކޮށްލާ.",
   addSelected:"ހޮވާފައިވާ {n} ސުވާލު އިތުރުކުރޭ",pickPdf:"ފުރަތަމަ ފައިލެއް ހޮވާ",
+  books:"ފޮތްތައް",myBook:"އަހަރެންގެ ފޮތް",sharedWithMe:"ތިބާއާ ހިއްސާކުރި ފޮތްތައް",noShared:"އަދި ފޮތެއް ހިއްސާކޮށްފައެއް ނެތް",bookOf:"{n} ގެ ފޮތް",viewOnly:"ބަލާލުމަށް ހަމައެކަނި",viewOnlyHint:"ބަލާލުމަށް ހަމައެކަނި · ފޮތް ވެރިޔާ ގެންނަ ބަދަލުތައް ވަގުތުން ފެންނާނެ",
+  share:"ހިއްސާކުރޭ",shareBook:"ފޮތް ހިއްސާކުރޭ",shareHint2:"ހިއްސާކުރާ ދަރިވަރުންނަށް ތިބާގެ ސުވާލުތަކުން ދަސްކުރެވޭނެ، ނަމަވެސް ބަދަލެއް ނުގެނެވޭނެ. ތިބާ ގެނައި ބަދަލުތައް އެމީހުންނަށް ވަގުތުން ފެންނާނެ.",
+  shareLinkTitle:"ލިންކް",linkOnLabel:"ލިންކް ލިބޭ ކޮންމެ މީހަކަށް ބަލައި ދަސްކުރެވޭނެ",copyLink:"ކޮޕީ",shareVia:"ލިންކް ފޮނުވާ…",linkOffNote:"ލިންކް ބަންދުކުރުމުން، ލިންކުން ހަމައެކަނި ވަދެފައިވާ މީހުންނަށް މިފޮތް ނުފެންނާނެ.",
+  shareStudents:"ދަރިވަރުންނާ ހިއްސާކުރޭ",sharedWithList:"ހިއްސާކޮށްފައިވާ ދަރިވަރުން",stopShare:"ހުއްޓާލާ",sharedTo:"{n} އާ ހިއްސާކޮށްފި",newShared:"{n} ފޮތެއް ތިބާއާ ހިއްސާކޮށްފި!",
+  readOnly:"މި ފޮތަކީ ބަލާލުމަށް ހަމައެކަނި. ބަދަލެއް ނުކުރެވޭނެ.",notShared:"މި ފޮތް މިހާރު ހިއްސާކޮށްފައެއް ނުވޭ",backMine:"އަހަރެންގެ ފޮތް",signInSave:"ވަދެ ރައްކާކުރޭ",removeFromList:"ލިސްޓުން ނަގާ",current:"ހުޅުވިފައި",openB:"ހުޅުވާ",emptyRO:"މި ފޮތުގައި އަދި ސުވާލެއް ނެތް.",linkCopied:"ލިންކް ކޮޕީކުރެވިއްޖެ",
   gHomeTitle:"ގްރޫޕް މުބާރާތް",gHomeText:"ޕޯޓަލް ބޭނުންކުރާ އެހެން ދަރިވަރުންނާ އެކު ލައިވް މުބާރާތެއް ކުޅޭ. ތިބާ މުބާރާތެއް ހަދައިފިނަމަ ތިބާއަކީ މޮޑަރޭޓަރ.",gCreate:"+ އާ މުބާރާތެއް ހަދާ",codePh:"މުބާރާތުގެ ކޯޑު",gJoinBtn:"ބައިވެރިވާން އެދޭ",
   gInvites:"ތިބާއަށް ލިބިފައިވާ ދަޢުވަތު",gInvitedBy:"{n} ގެ ދަޢުވަތު",accept:"ގަބޫލުކުރޭ",decline:"ނުގަބޫލުކުރޭ",gMyRooms:"ތިބާގެ މުބާރާތްތައް",noRooms:"އަދި މުބާރާތެއް ނެތް",gHosting:"މޮޑަރޭޓަރ",gPlaying:"ބައިވެރިއެއް",
   stLobby:"ތައްޔާރުވަނީ",stLive:"ލައިވް",stEnded:"ނިމިއްޖެ",gLocalTitle:"އެއް ޑިވައިސްގައި ޓީމް ގޭމް",gLocalText:"އެއް ފޯނެއް ނުވަތަ ސްކްރީނެއް ވަށައިގެން ޓީމްތަކަށް ބަހާލައިގެން ކުޅޭ.",
@@ -485,6 +532,11 @@ const I18N={
   reading:"Reading {f}…",fileFound:"Found {n} questions in {f} file(s). Check them, then save.",fileNone:"Files read, but no questions found in Q:/A:, ސ:/ޖ: or numbered question + Answer: format.",
   pdfNoText:"This PDF has no text (it looks scanned), so questions can't be read from it.",unsupported:"Can't read {f} — this file type isn't supported.",readFail:"Couldn't read {f}. Check the file.",pasteFail:"Couldn't paste. Try Ctrl+V.",
   addSelected:"Add {n} selected questions",pickPdf:"Choose a file first",
+  books:"Books",myBook:"My book",sharedWithMe:"Books shared with you",noShared:"No books shared with you yet",bookOf:"{n}'s book",viewOnly:"View only",viewOnlyHint:"View only · updates live when the owner makes changes",
+  share:"Share",shareBook:"Share my book",shareHint2:"Students you share with can study your questions but can't change them. Your changes show up for them right away.",
+  shareLinkTitle:"Link",linkOnLabel:"Anyone with the link can study this book",copyLink:"Copy",shareVia:"Send link…",linkOffNote:"Turning the link off removes access for everyone who only has the link.",
+  shareStudents:"Share with students",sharedWithList:"Shared with",stopShare:"Stop sharing",sharedTo:"Shared with {n}",newShared:"{n} shared a book with you!",
+  readOnly:"This book is view only. You can't change it.",notShared:"This book isn't shared any more",backMine:"My book",signInSave:"Sign in to save",removeFromList:"Remove from list",current:"Open",openB:"Open",emptyRO:"This book has no questions yet.",linkCopied:"Link copied",
   gHomeTitle:"Group competition",gHomeText:"Run a live competition with other students who use the portal. Whoever creates a competition is its moderator.",gCreate:"+ Create a competition",codePh:"Competition code",gJoinBtn:"Request to join",
   gInvites:"Invitations for you",gInvitedBy:"Invited by {n}",accept:"Accept",decline:"Decline",gMyRooms:"Your competitions",noRooms:"No competitions yet",gHosting:"Moderator",gPlaying:"Player",
   stLobby:"Getting ready",stLive:"Live",stEnded:"Finished",gLocalTitle:"Team game on one device",gLocalText:"Split into teams around one phone or screen.",
@@ -566,16 +618,19 @@ function setToggleLabel(){const b=$("#toggleAll");b.innerHTML=(showAll?'<svg vie
 function loadLocal(){try{const r=localStorage.getItem(LS_KEY);cards=r?JSON.parse(r):[]}catch(e){cards=[]}}
 function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(cards))}catch(e){}}
 async function persist(card){
+  if(mode==="view"){toast(t("readOnly"));return}
   const i=cards.findIndex(c=>c.id===card.id);if(i>=0)cards[i]=card;else cards.push(card);
   if(mode==="db"){try{await dbRef.doc(card.id).set(clean(card))}catch(e){toast(t("saveFail"))}}else saveLocal();
   renderAllStatic();
 }
 async function persistMany(list){
+  if(mode==="view"){toast(t("readOnly"));return}
   list.forEach(card=>{const i=cards.findIndex(c=>c.id===card.id);if(i>=0)cards[i]=card;else cards.push(card)});
   if(mode==="db"){for(const card of list){try{await dbRef.doc(card.id).set(clean(card))}catch(e){toast(t("someFail"));break}}}else saveLocal();
   renderAllStatic();
 }
 async function removeCard(id){
+  if(mode==="view"){toast(t("readOnly"));return}
   cards=cards.filter(c=>c.id!==id);
   if(mode==="db"){try{await dbRef.doc(id).delete()}catch(e){toast(t("delFail"))}}else saveLocal();
   renderAllStatic();
@@ -583,6 +638,7 @@ async function removeCard(id){
 async function bump(card,knew){
   const c={...card,seen:(card.seen||0)+1,known:knew?(card.known||0)+1:0};
   const i=cards.findIndex(x=>x.id===c.id);if(i>=0)cards[i]=c;
+  if(mode==="view"){prog[c.id]={known:c.known,seen:c.seen};saveProg();renderStats();return}
   if(mode==="db"){try{await dbRef.doc(c.id).update({seen:c.seen,known:c.known})}catch(e){}}else saveLocal();
   renderStats();
 }
@@ -649,7 +705,7 @@ function renderList(){
   renderChips($("#chips-list"),listFilter,s=>{listFilter=s;renderList()});
   const term=$("#search").value.trim().toLowerCase();
   const items=bySubj(listFilter).filter(c=>!term||(c.q+" "+c.a).toLowerCase().includes(term));
-  $("#emptyList").hidden=cards.length>0;
+  $("#emptyList").hidden=cards.length>0;$("#emptyList p").textContent=mode==="view"?t("emptyRO"):t("emptyText");
   $("#toggleAll").hidden=cards.length===0;$("#search").hidden=cards.length===0;
   $("#list").innerHTML=items.map(c=>{
     const open=showAll||openIds.has(c.id);
@@ -1012,6 +1068,7 @@ $$("#authSeg button").forEach(b=>b.onclick=()=>setAuthMode(b.dataset.a));
 function showAuth(on){$("#authView").hidden=!on;document.body.classList.toggle("authing",on);if(on)setTimeout(()=>$("#aNick").focus(),50)}
 function updateAccountUI(){
   const btn=$("#acctBtn");btn.hidden=!fbOn();
+  $("#booksBtn").hidden=!(fbOn()&&fbUser);$("#menuShare").hidden=!(fbOn()&&fbUser);updateViewBar();
   if(!fbOn())return;
   btn.textContent=fbUser?t("signOut",{n:fbNick}):t("signInMenu");
   $("#modeNote").textContent=fbUser?"👤 "+fbNick:t("tagline");
@@ -1045,7 +1102,7 @@ $("#aGo").onclick=async()=>{
       pendingCopy=local.length&&confirm(t("copyLocal",{n:local.length}))?local:null;
       pendingNick=nick;
       const cred=await fb.auth.createUserWithEmailAndPassword(email,pinPw(pin));
-      await fb.fs.collection("users").doc(cred.user.uid).set({nick,created:Date.now()});
+      await fb.fs.collection("users").doc(cred.user.uid).set({nick,created:Date.now()},{merge:true});
       fbNick=nick;updateAccountUI();
     }else{
       await fb.auth.signInWithEmailAndPassword(email,pinPw(pin));
@@ -1065,7 +1122,7 @@ $("#acctBtn").onclick=async()=>{
 async function startFirebase(){
   let localOnly=false;try{localOnly=localStorage.getItem("dv-study-localonly")==="1"}catch(e){}
   loadLocal();renderAllStatic();
-  if(!localOnly)showAuth(true);
+  if(!localOnly&&!parseHashBook())showAuth(true);
   try{
     await loadScript(FB+"firebase-app-compat.js");
     await loadScript(FB+"firebase-auth-compat.js");
@@ -1076,30 +1133,169 @@ async function startFirebase(){
   try{await fs.enablePersistence({synchronizeTabs:true})}catch(e){}
   fb={auth:firebase.auth(),fs};
   fb.auth.onAuthStateChanged(async u=>{
-    if(fbUnsub){fbUnsub();fbUnsub=null}
+    stopBookListeners();stopSharedWatch();
     fbUser=u;openIds.clear();
     if(u){
       showAuth(false);
       try{localStorage.removeItem("dv-study-localonly")}catch(e){}
-      fbNick=pendingNick||"";
-      try{const d=await fs.collection("users").doc(u.uid).get();if(d.exists&&d.data().nick)fbNick=d.data().nick}catch(e){}
-      pendingNick="";
-      mode="db";dbRef=fs.collection("users").doc(u.uid).collection("cards");cards=[];renderAllStatic();updateAccountUI();
+      fbNick=pendingNick||"";let prof=null;
+      try{const d=await fs.collection("users").doc(u.uid).get();if(d.exists){prof=d.data();if(prof.nick)fbNick=prof.nick}}catch(e){}
+      pendingNick="";libIds=(prof&&prof.library)||[];
+      updateAccountUI();
       if(fbNick)fs.collection("directory").doc(u.uid).set({nick:fbNick,nickLower:fbNick.toLowerCase()},{merge:true}).catch(e=>console.error(e));
-      startRoomsWatch();if(current==="group")groupHome();
-      fbUnsub=dbRef.onSnapshot(snap=>{
-        cards=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.created||0)-(b.created||0));
-        renderAllStatic();if(current!=="list"&&!document.querySelector(".view.on .qcard, .view.on .flash, .view.on .mgrid"))go(current,true);
-      },e=>{console.error(e);toast(t("errNet"))});
-      if(pendingCopy){const list=pendingCopy;pendingCopy=null;for(const c of list){try{await dbRef.doc(c.id).set(clean(c))}catch(e){}}}
+      startRoomsWatch();
+      try{await ensureMyBook(u,prof)}catch(e){console.error(e);toast(t("errNet"))}
+      if(fbUser!==u)return;
+      if(myBookId)myBookUnsub=fs.collection("books").doc(myBookId).onSnapshot(sn=>{myBookDoc=sn.data()||{};if($("#shareDlg").open)renderShare()},e=>console.error(e));
+      startSharedWatch();
+      const lb=parseHashBook();
+      if(lb&&lb!==myBookId)openSharedBook(lb,true);else openOwnBook();
+      if(current==="group")groupHome();
     }else{
-      stopRoomsWatch();
-      mode="local";dbRef=null;fbNick="";loadLocal();renderAllStatic();updateAccountUI();go("list",true);
+      stopRoomsWatch();myBookId=null;dbRef=null;fbNick="";updateAccountUI();
+      const lb=parseHashBook();
+      if(lb){showAuth(false);openSharedBook(lb,true);return}
+      viewBook=null;setReadonly(false);mode="local";loadLocal();renderAllStatic();go("list",true);
       let lo=false;try{lo=localStorage.getItem("dv-study-localonly")==="1"}catch(e){}
       showAuth(!lo);
     }
   });
 }
+
+/* ---------- Shared books (view-only, live) ---------- */
+let myBookId=null,viewBook=null,cardsUnsub=null,bookDocUnsub=null,myBookDoc={},myBookUnsub=null,sharedUnsub=null,sharedBooks=[],libBooks=[],libIds=[],firstShared=true,prog={},progT=null,shSearchT=null;
+function rid(n){const A="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";const r=crypto.getRandomValues(new Uint32Array(n));let x="";for(const v of r)x+=A[v%A.length];return x}
+const bookLink=id=>location.origin+location.pathname+"#book-"+id;
+function parseHashBook(){const m=location.hash.match(/^#book-([A-Za-z0-9]{10,40})$/);return m?m[1]:null}
+function clearHash(){if(location.hash)history.replaceState(null,"",location.pathname+location.search)}
+function stopBookListeners(){if(cardsUnsub)cardsUnsub();cardsUnsub=null;if(bookDocUnsub)bookDocUnsub();bookDocUnsub=null}
+function stopSharedWatch(){if(sharedUnsub)sharedUnsub();sharedUnsub=null;sharedBooks=[];libBooks=[];if(myBookUnsub)myBookUnsub();myBookUnsub=null;myBookDoc={}}
+function setReadonly(on){document.body.classList.toggle("readonly",on);$("#viewBar").hidden=!on;updateViewBar()}
+function updateViewBar(){if(!viewBook)return;$("#viewName").textContent=t("bookOf",{n:viewBook.nick||"…"});$("#viewBack").textContent=fbUser?t("backMine"):t("signInSave")}
+function afterCardsChange(){renderAllStatic();if(current!=="list"&&current!=="group"&&!document.querySelector(".view.on .qcard, .view.on .flash, .view.on .mgrid"))go(current,true)}
+const byCreated=(a,b)=>(a.created||0)-(b.created||0);
+
+async function ensureMyBook(u,prof){
+  const fs=fb.fs;
+  if(prof&&prof.bookId){myBookId=prof.bookId;fs.collection("books").doc(myBookId).set({nick:fbNick},{merge:true}).catch(()=>{});return}
+  const id=rid(20);
+  await fs.collection("books").doc(id).set({ownerUid:u.uid,nick:fbNick,linkOn:false,sharedWith:[],sharedNames:{},created:FV().serverTimestamp()});
+  try{ // move questions saved before sharing existed
+    const old=await fs.collection("users").doc(u.uid).collection("cards").get();
+    await Promise.all(old.docs.map(d=>fs.collection("books").doc(id).collection("cards").doc(d.id).set(d.data())));
+  }catch(e){console.error(e)}
+  await fs.collection("users").doc(u.uid).set({bookId:id},{merge:true});
+  myBookId=id;
+}
+function openOwnBook(){
+  if(!fbUser||!myBookId)return;
+  stopBookListeners();viewBook=null;prog={};setReadonly(false);clearHash();
+  mode="db";dbRef=fb.fs.collection("books").doc(myBookId).collection("cards");cards=[];openIds.clear();renderAllStatic();
+  cardsUnsub=dbRef.onSnapshot(snap=>{cards=snap.docs.map(d=>({id:d.id,...d.data()})).sort(byCreated);afterCardsChange()},e=>{console.error(e);toast(t("errNet"))});
+  if(pendingCopy){const list=pendingCopy;pendingCopy=null;Promise.all(list.map(c=>dbRef.doc(c.id).set(clean(c)))).catch(()=>{})}
+  if(current==="group")groupHome();
+}
+async function openSharedBook(id,fromLink){
+  if(fbUser&&id===myBookId){openOwnBook();return}
+  if(!fbUser)showAuth(false);
+  stopBookListeners();viewBook={id,nick:""};mode="view";dbRef=null;cards=[];openIds.clear();setReadonly(true);renderAllStatic();
+  if(location.hash!=="#book-"+id)history.replaceState(null,"","#book-"+id);
+  prog={};
+  if(fbUser){try{const d=await fb.fs.collection("users").doc(fbUser.uid).collection("progress").doc(id).get();prog=(d.exists&&d.data().p)||{}}catch(e){}}
+  else{try{prog=JSON.parse(localStorage.getItem("dv-prog-"+id)||"{}")}catch(e){prog={}}}
+  if(!viewBook||viewBook.id!==id)return;
+  const ref=fb.fs.collection("books").doc(id);
+  bookDocUnsub=ref.onSnapshot(sn=>{if(!sn.exists){bookGone();return}viewBook={id,...sn.data()};updateViewBar()},e=>{console.error(e);bookGone()});
+  cardsUnsub=ref.collection("cards").onSnapshot(snap=>{
+    cards=snap.docs.map(d=>{const c={id:d.id,...d.data()},pp=prog[d.id]||{};c.known=pp.known||0;c.seen=pp.seen||0;return c}).sort(byCreated);
+    afterCardsChange();
+  },e=>{console.error(e);bookGone()});
+  if(fbUser&&fromLink&&!libIds.includes(id)){libIds.push(id);fb.fs.collection("users").doc(fbUser.uid).set({library:FV().arrayUnion(id)},{merge:true}).catch(()=>{})}
+  if(current==="group")groupHome();
+}
+function bookGone(){
+  if(!viewBook)return;
+  toast(t("notShared"));stopBookListeners();clearHash();
+  if(fbUser&&myBookId){openOwnBook();return}
+  viewBook=null;setReadonly(false);mode="local";loadLocal();renderAllStatic();showAuth(true);
+}
+function saveProg(){
+  clearTimeout(progT);
+  progT=setTimeout(()=>{if(!viewBook)return;const id=viewBook.id;
+    if(fbUser)fb.fs.collection("users").doc(fbUser.uid).collection("progress").doc(id).set({p:prog}).catch(()=>{});
+    else{try{localStorage.setItem("dv-prog-"+id,JSON.stringify(prog))}catch(e){}}
+  },600);
+}
+function startSharedWatch(){
+  if(sharedUnsub)sharedUnsub();firstShared=true;
+  sharedUnsub=fb.fs.collection("books").where("sharedWith","array-contains",fbUser.uid).onSnapshot(snap=>{
+    const list=snap.docs.map(d=>({id:d.id,...d.data(),via:"direct"}));
+    if(!firstShared)list.forEach(b=>{if(!sharedBooks.some(x=>x.id===b.id))toast(t("newShared",{n:b.nick}))});
+    sharedBooks=list;firstShared=false;if($("#booksDlg").open)renderBooks();
+  },e=>console.error(e));
+}
+async function openBooks(){
+  if(!fbUser)return;
+  $("#booksDlg").showModal();renderBooks();
+  const got=[];
+  for(const id of libIds){if(id===myBookId||sharedBooks.some(b=>b.id===id))continue;
+    try{const sn=await fb.fs.collection("books").doc(id).get();if(sn.exists)got.push({id,...sn.data(),via:"link"})}catch(e){}}
+  libBooks=got;if($("#booksDlg").open)renderBooks();
+}
+function renderBooks(){
+  const el=$("#booksList"),cur=viewBook?viewBook.id:myBookId;
+  const all=sharedBooks.concat(libBooks.filter(b=>!sharedBooks.some(x=>x.id===b.id)));
+  let h=`<div class="rcard${cur===myBookId?" inv":""}"><div class="rt"><b>${t("myBook")}</b><small dir="auto">${esc(fbNick)}</small></div>
+    ${cur===myBookId?`<span class="pill ok">${t("current")}</span>`:`<button class="btn" data-own>${t("openB")}</button>`}<button class="btn primary" data-share>${t("share")}</button></div>
+    <p class="gsec">${t("sharedWithMe")}</p>`;
+  h+=all.length?all.map(b=>`<div class="rcard${cur===b.id?" inv":""}"><div class="rt"><b dir="auto">${esc(t("bookOf",{n:b.nick||"?"}))}</b><small>${t("viewOnly")}</small></div>
+    ${cur===b.id?`<span class="pill ok">${t("current")}</span>`:`<button class="btn" data-ob="${b.id}">${t("openB")}</button>`}
+    ${b.via==="link"?`<button class="btn ghost" data-rmlib="${b.id}" aria-label="${t("removeFromList")}" title="${t("removeFromList")}">✕</button>`:""}</div>`).join("")
+    :`<p class="msg">${t("noShared")}</p>`;
+  el.innerHTML=h;
+  el.querySelectorAll("[data-own]").forEach(b=>b.onclick=()=>{$("#booksDlg").close();openOwnBook();go("list")});
+  el.querySelectorAll("[data-share]").forEach(b=>b.onclick=openShare);
+  el.querySelectorAll("[data-ob]").forEach(b=>b.onclick=()=>{$("#booksDlg").close();openSharedBook(b.dataset.ob,false);go("list")});
+  el.querySelectorAll("[data-rmlib]").forEach(b=>b.onclick=()=>{const id=b.dataset.rmlib;libIds=libIds.filter(x=>x!==id);libBooks=libBooks.filter(x=>x.id!==id);
+    fb.fs.collection("users").doc(fbUser.uid).set({library:FV().arrayRemove(id)},{merge:true}).catch(()=>{});
+    if(viewBook&&viewBook.id===id)openOwnBook();renderBooks()});
+}
+function openShare(){
+  if(!fbUser||!myBookId)return;
+  if($("#booksDlg").open)$("#booksDlg").close();if($("#menuDlg").open)$("#menuDlg").close();
+  $("#shLink").value=bookLink(myBookId);$("#shSearch").value="";$("#shResults").innerHTML="";
+  $("#shareDlg").showModal();renderShare();
+}
+function renderShare(){
+  const b=myBookDoc||{};$("#shLinkOn").checked=!!b.linkOn;$("#shLinkBox").hidden=!b.linkOn;
+  const ids=b.sharedWith||[],names=b.sharedNames||{};
+  $("#shList").innerHTML=ids.length?`<p class="gsec">${t("sharedWithList")}</p>`+ids.map(u=>`<div class="mrow"><span class="nm" dir="auto">${esc(names[u]||"?")}</span><button class="btn ghost" data-unshare="${u}">${t("stopShare")}</button></div>`).join(""):"";
+  $$("#shList [data-unshare]").forEach(x=>x.onclick=()=>act(()=>fb.fs.collection("books").doc(myBookId).update({sharedWith:FV().arrayRemove(x.dataset.unshare),["sharedNames."+x.dataset.unshare]:FV().delete()})));
+}
+async function shareSearch(){
+  const box=$("#shResults"),term=$("#shSearch").value.trim().toLowerCase();if(!term){box.innerHTML="";return}
+  try{
+    const snap=await fb.fs.collection("directory").orderBy("nickLower").startAt(term).endAt(term+"\uf8ff").limit(8).get();
+    const rows=[],have=(myBookDoc&&myBookDoc.sharedWith)||[];snap.forEach(d=>{if(d.id!==fbUser.uid)rows.push({uid:d.id,...d.data()})});
+    box.innerHTML=rows.length?rows.map(u=>`<div class="mrow"><span class="nm" dir="auto">${esc(u.nick)}</span>${have.includes(u.uid)?`<span class="pill ok">✓</span>`:`<button class="btn primary" data-sh="${u.uid}" data-nick="${esc(u.nick)}">${t("share")}</button>`}</div>`).join(""):`<p class="msg">${t("noUsers")}</p>`;
+    box.querySelectorAll("[data-sh]").forEach(x=>x.onclick=()=>act(async()=>{
+      await fb.fs.collection("books").doc(myBookId).update({sharedWith:FV().arrayUnion(x.dataset.sh),["sharedNames."+x.dataset.sh]:x.dataset.nick});
+      x.outerHTML=`<span class="pill ok">✓</span>`;toast(t("sharedTo",{n:x.dataset.nick}));
+    }));
+  }catch(e){console.error(e);box.innerHTML=`<p class="msg">${t("actionFail")}</p>`}
+}
+$("#booksBtn").onclick=openBooks;
+$("#booksClose").onclick=()=>$("#booksDlg").close();
+$("#shareClose").onclick=()=>$("#shareDlg").close();
+$("#menuShare").onclick=openShare;
+$("#shLinkOn").onchange=e=>act(()=>fb.fs.collection("books").doc(myBookId).update({linkOn:e.target.checked}));
+$("#shCopy").onclick=async()=>{try{await navigator.clipboard.writeText($("#shLink").value);toast(t("linkCopied"))}catch(e){$("#shLink").select()}};
+$("#shNative").onclick=async()=>{const url=$("#shLink").value;
+  if(navigator.share){try{await navigator.share({title:t("bookOf",{n:fbNick}),url});return}catch(e){if(e&&e.name==="AbortError")return}}
+  try{await navigator.clipboard.writeText(url);toast(t("linkCopied"))}catch(e){$("#shLink").select()}};
+$("#shSearch").addEventListener("input",()=>{clearTimeout(shSearchT);shSearchT=setTimeout(shareSearch,300)});
+$("#viewBack").onclick=()=>{if(fbUser){openOwnBook();go("list")}else{setAuthMode("in");showAuth(true)}};
+window.addEventListener("hashchange",()=>{const id=parseHashBook();if(id&&fb&&(!viewBook||viewBook.id!==id))openSharedBook(id,true)});
 
 /* ---------- Online group competitions (Firebase) ---------- */
 let myRooms=[],roomsUnsub=null,roomId=null,room=null,roomUnsub=null,ansUnsub=null,ansKey="",answers={},roomTick=null,roomKey="",revealKey="",seenNotes=new Set(),firstRooms=true,searchT=null;
@@ -1400,6 +1596,7 @@ $("#themeBtn").onclick=()=>{
 try{const th=localStorage.getItem("dv-study-theme");if(th)document.documentElement.dataset.theme=th}catch(e){}
 $("#resetProgBtn").onclick=async()=>{
   if(!confirm(t("confirmReset")))return;
+  if(mode==="view"){$("#menuDlg").close();prog={};cards=cards.map(c=>({...c,known:0,seen:0}));saveProg();renderAllStatic();toast(t("resetDone"));return}
   $("#menuDlg").close();await persistMany(cards.map(c=>({...c,known:0,seen:0})));toast(t("resetDone"));
 };
 $("#exportBtn").onclick=async()=>{

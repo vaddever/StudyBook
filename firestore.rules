@@ -1,11 +1,98 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each student can only read and write their own study book.
+
+    function signedIn() { return request.auth != null; }
+
+    // Private profile, reading list, own progress on shared books
+    // (and questions saved before sharing existed)
+    match /users/{uid}/{document=**} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Study books: only the owner can change them. Students it is shared
+    // with (or anyone with the link, while the link is on) can read them.
+    match /books/{bookId} {
+      function canView(b) {
+        return b.linkOn == true
+          || (signedIn() && (b.ownerUid == request.auth.uid || request.auth.uid in b.sharedWith));
+      }
+      allow get: if canView(resource.data);
+      allow list: if signedIn()
+        && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.sharedWith);
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if signedIn() && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
       match /cards/{cardId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
+        allow read: if canView(get(/databases/$(database)/documents/books/$(bookId)).data);
+        allow write: if signedIn()
+          && get(/databases/$(database)/documents/books/$(bookId)).data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // Nickname directory, so moderators can find and invite students
+    match /directory/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Group competitions
+    match /rooms/{roomId} {
+
+      // A player may only change their own entry: accept / decline / leave an
+      // invitation, or request to join an open lobby. Scores stay untouched.
+      function memberChangeOk(uid, before, m) {
+        return ((uid in before.members)
+                 && before.members[uid].status in ['invited', 'joined']
+                 && m.status in ['joined', 'declined', 'left']
+                 && m.score == before.members[uid].score)
+            || (!(uid in before.members)
+                 && m.status == 'requested' && m.score == 0
+                 && before.status == 'lobby' && before.locked == false);
+      }
+      function selfUpdateOk() {
+        let uid = request.auth.uid;
+        let before = resource.data;
+        let after = request.resource.data;
+        let oldIds = before.memberIds.toSet();
+        let newIds = after.memberIds.toSet();
+        return after.diff(before).affectedKeys().hasOnly(['members', 'memberIds'])
+          && after.members.diff(before.members).affectedKeys().hasOnly([uid])
+          && newIds.difference(oldIds).hasOnly([uid])
+          && oldIds.difference(newIds).size() == 0
+          && memberChangeOk(uid, before, after.members[uid]);
+      }
+
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.hostUid == request.auth.uid
+                    && request.resource.data.memberIds.hasAll([request.auth.uid]);
+      allow delete: if signedIn() && resource.data.hostUid == request.auth.uid;
+      // The moderator (creator) controls everything; others only their own entry.
+      allow update: if signedIn() && (
+            (resource.data.hostUid == request.auth.uid
+              && request.resource.data.hostUid == resource.data.hostUid)
+            || selfUpdateOk());
+
+      // Answers: one per player per question, only while the question is open.
+      match /answers/{ansId} {
+        function answerOk() {
+          let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
+          let a = request.resource.data;
+          return a.uid == request.auth.uid
+            && room.members[request.auth.uid].status == 'joined'
+            && room.status == 'live' && room.phase == 'question'
+            && a.qi == room.qi && a.round == room.round
+            && ansId == string(a.round) + '_' + string(a.qi) + '_' + request.auth.uid;
+        }
+        allow read: if signedIn();
+        allow create: if signedIn() && answerOk();
+        allow delete: if signedIn()
+          && get(/databases/$(database)/documents/rooms/$(roomId)).data.hostUid == request.auth.uid;
       }
     }
   }
